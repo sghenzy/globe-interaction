@@ -85,7 +85,7 @@ let scene, camera, renderer, globe, controls, particleSystem;
 
       pinPositions.forEach((pos, index) => {
         const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-        const pinMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
         const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
         const phi = (90 - pos.lat * 180) * (Math.PI / 180);

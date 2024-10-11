@@ -15,7 +15,7 @@ body, html {
 
   #info-text-left, #info-text-right {
     position: absolute;
-    z-index: 20;
+    z-index: 10;
   }
   .info-text {
     position: absolute;

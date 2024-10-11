@@ -1,0 +1,70 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000;
+    cursor: default;
+  }
+
+  #globe-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden; 
+  }
+
+  .info-text {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 1rem;
+    opacity: 0;
+    pointer-events: auto;
+    padding: 16px;
+    border-radius: 8px;
+    background: rgba(200, 200, 200, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.5s ease, transform 0.3s ease, box-shadow 0.5s ease;
+    perspective: 800px;
+  }
+
+  .info-text:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 64px rgba(255, 255, 255, 0.05);
+  }
+
+  .divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    margin: 4px 0;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  .info-text:hover .divider {
+    width: 100%;
+  }
+
+  .info-text-left {
+    left: 10%;
+    text-align: left;
+  }
+
+  .info-text-right {
+    right: 10%;
+    text-align: right;
+  }
+
+  .body-text {
+    font-size: 0.8rem;
+    opacity: 0;
+    margin-top: 10px;
+  }
+
+  .title-left, .title-right {
+    display: inline-block;
+    opacity: 0;
+  }

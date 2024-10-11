@@ -62,7 +62,7 @@ let scene, camera, renderer, globe, controls, particleSystem;
       controls.maxDistance = 5;
       controls.enablePan = false;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.2;
+      controls.autoRotateSpeed = 0.09;
       controls.enableDamping = true;
       controls.dampingFactor = 0.1;
 
@@ -266,7 +266,7 @@ let scene, camera, renderer, globe, controls, particleSystem;
       requestAnimationFrame(animate);
 
       if (!isPinClicked) {
-        globe.rotation.y += 0.00005;  // Rallenta la rotazione del globo
+        globe.rotation.y += 0.00001;  // Rallenta la rotazione del globo
       }
 
       if (selectedPin && !cameraMoving) {

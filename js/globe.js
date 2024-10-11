@@ -140,14 +140,14 @@ let scene, camera, renderer, globe, controls, particleSystem;
         selectedPin = pin;
         cameraMoving = true;
     
-        // Imposta una posizione fissa per la camera quando si clicca un pin
-        const cameraTargetPosition = new THREE.Vector3(3, 0.5, 3);  // Posizione fissa a destra dello schermo
-        const controlsTargetPosition = new THREE.Vector3(0, 0, 0);  // Centro del globo
+        const targetPosition = pin.position.clone().normalize().multiplyScalar(2.5);
+        const offset = new THREE.Vector3(1, 0.5, 1);  // Aumentiamo l'offset sull'asse X per spostare la vista a destra
+        const cameraPosition = targetPosition.clone().add(offset);
     
         gsap.to(camera.position, {
-          x: cameraTargetPosition.x,
-          y: cameraTargetPosition.y,
-          z: cameraTargetPosition.z,
+          x: cameraPosition.x,
+          y: cameraPosition.y,
+          z: cameraPosition.z,
           duration: 2,
           ease: 'power2.inOut',
           onUpdate: () => controls.update(),
@@ -155,9 +155,9 @@ let scene, camera, renderer, globe, controls, particleSystem;
         });
     
         gsap.to(controls.target, {
-          x: controlsTargetPosition.x,
-          y: controlsTargetPosition.y,
-          z: controlsTargetPosition.z,
+          x: pin.position.x,
+          y: pin.position.y,
+          z: pin.position.z,
           duration: 2,
           ease: 'power2.inOut'
         });
@@ -166,7 +166,6 @@ let scene, camera, renderer, globe, controls, particleSystem;
         showText();
       }
     }
-    
 
     function onGlobeClick(event) {
       if (cameraMoving) return;

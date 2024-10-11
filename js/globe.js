@@ -218,20 +218,15 @@ let scene, camera, renderer, globe, controls, particleSystem;
     function showText() {
       const description = pinDescriptions[currentDescriptionIndex];
       
-      // Posiziona entrambi i riquadri sulla sinistra
       infoTextLeft.querySelector('.title-left').innerText = description.left.title;
       infoTextRight.querySelector('.title-right').innerText = description.right.title;
-    
-      // Modifichiamo la posizione di entrambi i testi, spostandoli a sinistra
-      infoTextLeft.style.left = '10px';  // Posizioniamo entrambi i testi a sinistra
-      infoTextRight.style.left = '10px';  // Posizioniamo il testo destro anch'esso a sinistra
-      
+
       gsap.to(infoTextLeft, { opacity: 1, duration: 1, scale: 1.2, ease: 'power2.out' });
       gsap.to(infoTextRight, { opacity: 1, duration: 1, scale: 1.2, ease: 'power2.out' });
-    
+
       typeText(bodyTextLeft, description.left.body);
       typeText(bodyTextRight, description.right.body);
-    
+
       gsap.to(infoTextLeft.querySelector('.title-left'), { opacity: 1, duration: 0.5 });
       gsap.to(infoTextRight.querySelector('.title-right'), { opacity: 1, duration: 0.5 });
     }

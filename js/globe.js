@@ -124,26 +124,26 @@ let scene, camera, renderer, globe, controls, particleSystem;
 
     function onPointerDown(event) {
       if (cameraMoving) return;
-
+    
       const mouse = new THREE.Vector2();
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(pins);
-
+    
       if (intersects.length > 0) {
         const pin = intersects[0].object;
         controls.autoRotate = false;
         isPinClicked = true;
         selectedPin = pin;
         cameraMoving = true;
-
+    
         const targetPosition = pin.position.clone().normalize().multiplyScalar(2.5);
-        const offset = new THREE.Vector3(0, 0.5, 1);
+        const offset = new THREE.Vector3(1, 0.5, 1);  // Aumentiamo l'offset sull'asse X per spostare la vista a destra
         const cameraPosition = targetPosition.clone().add(offset);
-
+    
         gsap.to(camera.position, {
           x: cameraPosition.x,
           y: cameraPosition.y,
@@ -153,7 +153,7 @@ let scene, camera, renderer, globe, controls, particleSystem;
           onUpdate: () => controls.update(),
           onComplete: () => { cameraMoving = false; }
         });
-
+    
         gsap.to(controls.target, {
           x: pin.position.x,
           y: pin.position.y,
@@ -161,7 +161,7 @@ let scene, camera, renderer, globe, controls, particleSystem;
           duration: 2,
           ease: 'power2.inOut'
         });
-
+    
         currentDescriptionIndex = pin.userData.descriptionIndex;
         showText();
       }
@@ -218,15 +218,20 @@ let scene, camera, renderer, globe, controls, particleSystem;
     function showText() {
       const description = pinDescriptions[currentDescriptionIndex];
       
+      // Posiziona entrambi i riquadri sulla sinistra
       infoTextLeft.querySelector('.title-left').innerText = description.left.title;
       infoTextRight.querySelector('.title-right').innerText = description.right.title;
-
+    
+      // Modifichiamo la posizione di entrambi i testi, spostandoli a sinistra
+      infoTextLeft.style.left = '10px';  // Posizioniamo entrambi i testi a sinistra
+      infoTextRight.style.left = '10px';  // Posizioniamo il testo destro anch'esso a sinistra
+      
       gsap.to(infoTextLeft, { opacity: 1, duration: 1, scale: 1.2, ease: 'power2.out' });
       gsap.to(infoTextRight, { opacity: 1, duration: 1, scale: 1.2, ease: 'power2.out' });
-
+    
       typeText(bodyTextLeft, description.left.body);
       typeText(bodyTextRight, description.right.body);
-
+    
       gsap.to(infoTextLeft.querySelector('.title-left'), { opacity: 1, duration: 0.5 });
       gsap.to(infoTextRight.querySelector('.title-right'), { opacity: 1, duration: 0.5 });
     }

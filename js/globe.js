@@ -75,37 +75,6 @@ let scene, camera, renderer, globe, controls, particleSystem;
       addParticles();
       animate();
     }
-
-    function addBackgroundGradient() {
-      const geometry = new THREE.PlaneGeometry(20, 20);
-      const material = new THREE.ShaderMaterial({
-        uniforms: {
-          color1: { value: new THREE.Color(0x000000) }, // Colore bordo (nero)
-          color2: { value: new THREE.Color(0x161616) }  // Colore centro
-        },
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          uniform vec3 color1;
-          uniform vec3 color2;
-          varying vec2 vUv;
-          void main() {
-            float dist = distance(vUv, vec2(0.5, 0.5));
-            gl_FragColor = vec4(mix(color2, color1, smoothstep(0.3, 0.8, dist)), 1.0);
-          }
-        `,
-        transparent: true
-      });
-    
-      const background = new THREE.Mesh(geometry, material);
-      background.position.z = -5;  // Posiziona lo sfondo dietro il globo
-      scene.add(background);
-    }
     
     function addPins() {
       const pinPositions = [
@@ -313,4 +282,3 @@ let scene, camera, renderer, globe, controls, particleSystem;
     }
 
     init();
-    addBackgroundGradient();

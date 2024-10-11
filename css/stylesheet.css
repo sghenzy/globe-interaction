@@ -13,8 +13,13 @@ body, html {
     overflow: hidden; 
   }
 
+  #info-text-left, #info-text-right {
+    position: absolute;
+    z-index: 20;
+  }
   .info-text {
     position: absolute;
+    z-index: 20;
     top: 40%;
     transform: translateY(-50%);
     color: white;

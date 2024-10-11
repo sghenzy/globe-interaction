@@ -7,36 +7,17 @@
   <link rel="stylesheet" href="css/stylesheet.css">
 </head>
 <body>
-  <!-- Contenitore per il globo -->
-  <div id="globe-wrapper" style="position: relative; width: 100%; height: 100%;">
-
-    <!-- Solo il globo ha la sfumatura -->
-    <div id="globe-container" style="
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
-      -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
-    ">
-      <canvas id="globe-canvas"></canvas> <!-- Render di Three.js -->
+  <div id="globe-container">
+    <div id="info-text-left" class="info-text info-text-left">
+      <span class="title-left">Lorem ipsum sinistro</span>
+      <div class="divider"></div>
+      <div class="body-text" id="body-text-left"></div>
     </div>
-
-    <!-- Contenitore per i testi, senza sfumatura -->
-    <div id="text-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20;">
-      <div id="info-text-left" class="info-text info-text-left">
-        <span class="title-left">Lorem ipsum sinistro</span>
-        <div class="divider"></div>
-        <div class="body-text" id="body-text-left"></div>
-      </div>
-      <div id="info-text-right" class="info-text info-text-right">
-        <span class="title-right">Lorem ipsum destro</span>
-        <div class="divider"></div>
-        <div class="body-text" id="body-text-right"></div>
-      </div>
+    <div id="info-text-right" class="info-text info-text-right">
+      <span class="title-right">Lorem ipsum destro</span>
+      <div class="divider"></div>
+      <div class="body-text" id="body-text-right"></div>
     </div>
-
   </div>
 
   <script src="js/three.js"></script>

@@ -7,35 +7,17 @@
   <link rel="stylesheet" href="css/stylesheet.css">
 </head>
 <body>
-  <div id="globe-container" style="position: relative; width: 100%; height: 100%;">
-
-    <!-- Div per la scena del globo (dove applicheremo la sfumatura) -->
-    <div id="globe-scene" style="
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
-      -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
-      z-index: 1;
-    ">
-      <!-- Il canvas o la scena Three.js verranno renderizzati qui -->
-    </div>
-
-    <!-- I riquadri di testo -->
-    <div id="info-text-left" class="info-text info-text-left" style="z-index: 10; position: absolute;">
+  <div id="globe-container">
+    <div id="info-text-left" class="info-text info-text-left">
       <span class="title-left">Lorem ipsum sinistro</span>
       <div class="divider"></div>
       <div class="body-text" id="body-text-left"></div>
     </div>
-
-    <div id="info-text-right" class="info-text info-text-right" style="z-index: 10; position: absolute;">
+    <div id="info-text-right" class="info-text info-text-right">
       <span class="title-right">Lorem ipsum destro</span>
       <div class="divider"></div>
       <div class="body-text" id="body-text-right"></div>
     </div>
-
   </div>
 
   <script src="js/three.js"></script>

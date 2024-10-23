@@ -34,7 +34,7 @@ body, html {
   flex-direction: column;
   height: 20vh;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 2vh;
   background: #9CC9C6; /* Colore di fondo */
   border-radius: 8px;
   overflow: hidden;
@@ -49,10 +49,11 @@ body, html {
 
 #side-column p {
   margin: 0;
-  padding: 8px;
+  padding: 1vh;
+  padding-left: 1vw;
   background: #e0e0e0;
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 #globe-container {

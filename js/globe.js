@@ -112,9 +112,13 @@ function focusOnPin(pinIndex) {
   pin.userData.label.visible = true; // Mostra l'etichetta del pin selezionato
   selectedPin = pin;
 
-  // Calcola la rotazione necessaria per portare il pin in vista
-  const globeRotation = new THREE.Vector3().copy(pin.position).normalize();
-  const targetRotation = new THREE.Euler().setFromVector3(globeRotation);
+  // Calcola la rotazione necessaria per portare il pin in vista su tutti gli assi
+  const direction = pin.position.clone().normalize(); // Direzione verso il pin
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y), // Ruota sull'asse X per regolare l'altezza
+    Math.atan2(-direction.x, direction.z), // Ruota sull'asse Y per regolare la rotazione orizzontale
+    0
+  );
 
   gsap.to(globe.rotation, {
     x: targetRotation.x,

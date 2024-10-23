@@ -8,35 +8,50 @@
 </head>
 <body>
 
+  <!-- Colonna laterale scrollabile -->
+  <div id="side-column">
+    <div class="item">
+      <img src="img/photo1.jpg" alt="Agenzia 1" />
+      <p>Nome dell'agenzia 1</p>
+    </div>
+    <div class="item">
+      <img src="img/photo2.jpg" alt="Agenzia 2" />
+      <p>Nome dell'agenzia 2</p>
+    </div>
+    <div class="item">
+      <img src="img/photo3.jpg" alt="Agenzia 3" />
+      <p>Nome dell'agenzia 3</p>
+    </div>
+    <div class="item">
+      <img src="img/photo4.jpg" alt="Agenzia 4" />
+      <p>Nome dell'agenzia 4</p>
+    </div>
+    <div class="item">
+      <img src="img/photo5.jpg" alt="Agenzia 5" />
+      <p>Nome dell'agenzia 5</p>
+    </div>
+    <div class="item">
+      <img src="img/photo6.jpg" alt="Agenzia 6" />
+      <p>Nome dell'agenzia 6</p>
+    </div>
+    <div class="item">
+      <img src="img/photo7.jpg" alt="Agenzia 7" />
+      <p>Nome dell'agenzia 7</p>
+    </div>
+    <div class="item">
+      <img src="img/photo8.jpg" alt="Agenzia 8" />
+      <p>Nome dell'agenzia 8</p>
+    </div>
+  </div>
+
   <!-- Contenitore per il globo con la sfumatura -->
   <div id="globe-container" style="
     position: relative;
     width: 100%;
     height: 100%;
+    margin-left: 220px; /* Spazio lasciato per la colonna laterale */
   ">
     <!-- Il globo verrà renderizzato all'interno di questo container -->
-  </div>
-
-  <!-- Contenitore separato per i testi -->
-  <div id="text-container" style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10; /* Il testo avrà un z-index più alto rispetto al globo */
-  ">
-    <div id="info-text-left" class="info-text info-text-left">
-      <span class="title-left">Lorem ipsum sinistro</span>
-      <div class="divider"></div>
-      <div class="body-text" id="body-text-left">Descrizione lato sinistro</div>
-    </div>
-    <div id="info-text-right" class="info-text info-text-right">
-      <span class="title-right">Lorem ipsum destro</span>
-      <div class="divider"></div>
-      <div class="body-text" id="body-text-right">Descrizione lato destro</div>
-    </div>
   </div>
 
   <script src="js/three.js"></script>

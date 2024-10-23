@@ -12,16 +12,27 @@ body, html {
   left: 0;
   top: 0;
   height: 100vh;
-  width: 200px;  /* Larghezza della colonna */
-  overflow-y: auto;  /* Scroll verticale */
-  padding: 10px;
-  background-color: #1e1e1e; /* Colore di sfondo */
+  width: 16vw; /* Aumentata la larghezza della colonna */
+  overflow-y: scroll; /* Mantenuto scroll per funzionalità */
+  padding: 2vh 3vw; /* Aggiunto più padding ai lati e sopra/sotto */
+  backdrop-filter: blur(10px); /* Aggiunto blur per sfondo */
   z-index: 15;  /* Posiziona sopra il globo */
+}
+
+/* Nascondi la scrollbar per un aspetto più pulito */
+#side-column::-webkit-scrollbar {
+  display: none;
+}
+
+#side-column {
+  -ms-overflow-style: none;  /* IE e Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 #side-column .item {
   display: flex;
   flex-direction: column;
+  height: 20vh;
   align-items: center;
   margin-bottom: 20px;
   background: #9CC9C6; /* Colore di fondo */
@@ -29,9 +40,10 @@ body, html {
   overflow: hidden;
 }
 
+
 #side-column img {
   width: 100%;
-  height: 80px;  /* Altezza fissa dell'immagine */
+  height: 90%;
   object-fit: cover;
 }
 

@@ -90,8 +90,12 @@ canvas, .three-canvas {
   }
 
   #globe-container {
-    height: 60vh; /* Set height for the globe container */
-    width: 100vw; /* Ensure full width for the globe */
+    height: 100vh; /* Full height for the globe */
+    width: 100vw; /* Full width for the globe container */
+    overflow: hidden; /* Hide any overflow */
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   #side-column {
@@ -104,26 +108,25 @@ canvas, .three-canvas {
     z-index: 555;
     flex-direction: row;
     overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: hidden; /* Hide vertical overflow */
-    padding: 0 10px; /* Add padding for better appearance */
+    overflow-y: hidden;
+    padding: 0 10px;
     box-sizing: border-box;
-    scrollbar-width: thin; /* Firefox: thin scrollbar */
   }
 
-  /* Nasconde la scrollbar per un aspetto più pulito */
-#side-column::-webkit-scrollbar {
-  display: none;
-}
-
-#side-column {
-  -ms-overflow-style: none;  /* IE e Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
   #side-column .item {
-    width: 40vw; /* Width of each item in the row */
-    height: 100%; /* Make each item take full row height */
-    margin-right: 2vw; /* Space between items */
-    flex-shrink: 0; /* Prevent items from shrinking */
+    width: 40vw;
+    height: 100%;
+    margin-right: 2vw;
+    flex-shrink: 0;
+  }
+
+    /* Nasconde la scrollbar per un aspetto più pulito */
+  #side-column::-webkit-scrollbar {
+    display: none;
+  }
+
+  #side-column {
+    -ms-overflow-style: none;  /* IE e Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 }

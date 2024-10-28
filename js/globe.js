@@ -108,35 +108,42 @@ function addPins() {
 
 // Funzione per ridimensionare solo il globo
 function resizeGlobe() {
-  const maxGlobeScale = 1;
-  const minGlobeScale = 0.3; // Riduzione minima consentita sotto gli 800px
+  const maxGlobeScale = 1;      // Scale for larger screens
+  const minGlobeScale = 0.3;    // Minimum scale for screens between 800px and 560px
+  const mobileScale = 0.6;      // Slightly larger scale for screens below 479px
 
   const screenWidth = window.innerWidth;
   let scaleFactor = maxGlobeScale;
 
-  // Scala gradualmente il globo per schermi più piccoli
+  // Scale down gradually for screens below 850px
   if (screenWidth < 850) {
     scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
     scaleFactor = Math.max(minGlobeScale, scaleFactor);
   }
 
-  // Applica la scala solo al globo, mantenendo invariata la dimensione dei pin
+  // Additional scaling for very small screens (below 479px)
+  if (screenWidth < 479) {
+    scaleFactor = mobileScale;
+  }
+
+  // Apply the scale to the globe
   globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
 }
 
 
 // Gestione del ridimensionamento della finestra
 function onWindowResize() {
-  const containerWidth = window.innerWidth - 300;
+  let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
 
+  // Adjust the camera aspect ratio and renderer dimensions
   camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
 
   renderer.setSize(containerWidth, containerHeight);
   labelRenderer.setSize(containerWidth, containerHeight);
 
-  // Aggiorna la scala del globo
+  // Update the globe size based on new screen size
   resizeGlobe();
 }
 

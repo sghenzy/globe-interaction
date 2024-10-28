@@ -76,3 +76,54 @@ canvas, .three-canvas {
   width: 100%;
   text-align: left;
 }
+
+/* Aggiungi questo codice alla fine del file stylesheet.css */
+
+/* Responsive layout for screens below 479px */
+/* Responsive layout for screens below 479px */
+@media (max-width: 479px) {
+  #container {
+    display: flex;
+    flex-direction: column; /* Stack globe and sidebar vertically */
+    align-items: center;
+    height: 100vh; /* Ensure container takes the full viewport height */
+  }
+
+  #globe-container {
+    height: 60vh; /* Set height for the globe container */
+    width: 100vw; /* Ensure full width for the globe */
+  }
+
+  #side-column {
+    width: 100vw; /* Sidebar takes full width */
+    height: 22vh; /* Set height for row scroll */
+    display: flex;
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    z-index: 555;
+    flex-direction: row;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical overflow */
+    padding: 0 10px; /* Add padding for better appearance */
+    box-sizing: border-box;
+    scrollbar-width: thin; /* Firefox: thin scrollbar */
+  }
+
+  /* Nasconde la scrollbar per un aspetto più pulito */
+#side-column::-webkit-scrollbar {
+  display: none;
+}
+
+#side-column {
+  -ms-overflow-style: none;  /* IE e Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+  #side-column .item {
+    width: 40vw; /* Width of each item in the row */
+    height: 100%; /* Make each item take full row height */
+    margin-right: 2vw; /* Space between items */
+    flex-shrink: 0; /* Prevent items from shrinking */
+  }
+}

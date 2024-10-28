@@ -1,6 +1,6 @@
 let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
 const pins = [];
-let selectedPin = null; // Variabile per tracciare il pin selezionato
+let selectedPin = null;
 
 function init() {
   const container = document.getElementById('globe-container');
@@ -13,13 +13,13 @@ function init() {
 
   // Inizializza il renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth - 300, window.innerHeight); // Dimensione iniziale
+  renderer.setSize(window.innerWidth - 300, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild(renderer.domElement);
 
   // Inizializza il label renderer per i testi descrittivi
   labelRenderer = new THREE.CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight); // Dimensione iniziale
+  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0';
   container.appendChild(labelRenderer.domElement);
@@ -56,7 +56,7 @@ function init() {
 
   // Event listener per il ridimensionamento
   window.addEventListener('resize', onWindowResize);
-  onWindowResize(); // Imposta la dimensione iniziale
+  onWindowResize();
   addParticles();
   animate();
 }
@@ -77,7 +77,7 @@ function addPins() {
   const globeRadius = 0.6;
 
   pinPositions.forEach((pos, index) => {
-    const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
+    const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); // Dimensione iniziale fissa per i pin
     const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
@@ -96,53 +96,57 @@ function addPins() {
 
     const label = new THREE.CSS2DObject(labelDiv);
     label.position.set(0, 0.1, 0);
-    label.visible = false; // Nascondi il testo inizialmente
+    label.visible = false;
     pin.add(label);
 
     pin.userData.index = index;
-    pin.userData.label = label; // Associa l'oggetto CSS2D per modificare la visibilità
+    pin.userData.label = label;
     globe.add(pin);
     pins.push(pin);
   });
 }
 
-// Funzione per ridimensionare i pin in base alla dimensione della finestra
-function updatePinSize() {
-  const scaleFactor = window.innerHeight * 0.001;
-  pins.forEach(pin => pin.scale.set(scaleFactor, scaleFactor, scaleFactor));
-}
+// Funzione per ridimensionare solo il globo
+function resizeGlobe() {
+  const maxGlobeScale = 1;
+  const minGlobeScale = 0.3; // Riduzione minima consentita sotto gli 800px
 
-window.addEventListener('resize', updatePinSize);
+  const screenWidth = window.innerWidth;
+  let scaleFactor = maxGlobeScale;
 
-// Funzione per ruotare e selezionare il pin
-function focusOnPin(pinIndex) {
-  const pin = pins[pinIndex];
-  if (!pin) return;
-
-  if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-    selectedPin.userData.label.visible = false; // Nascondi l'etichetta del pin precedente
+  // Scala gradualmente il globo per schermi più piccoli
+  if (screenWidth < 850) {
+    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
+    scaleFactor = Math.max(minGlobeScale, scaleFactor);
   }
 
-  pin.material.color.set('rgb(173, 216, 230)'); // Colore azzurro
-  pin.userData.label.visible = true; // Mostra l'etichetta del pin selezionato
-  selectedPin = pin;
+  // Applica la scala solo al globo, mantenendo invariata la dimensione dei pin
+  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
+}
 
-  const direction = pin.position.clone().normalize();
-  const targetRotation = new THREE.Euler(
-    Math.asin(direction.y),
-    Math.atan2(-direction.x, direction.z),
-    0
-  );
 
-  gsap.to(globe.rotation, {
-    x: targetRotation.x,
-    y: targetRotation.y,
-    z: targetRotation.z,
-    duration: 1.5,
-    ease: 'power2.inOut',
-    onUpdate: () => controls.update()
-  });
+// Gestione del ridimensionamento della finestra
+function onWindowResize() {
+  const containerWidth = window.innerWidth - 300;
+  const containerHeight = window.innerHeight;
+
+  camera.aspect = containerWidth / containerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(containerWidth, containerHeight);
+  labelRenderer.setSize(containerWidth, containerHeight);
+
+  // Aggiorna la scala del globo
+  resizeGlobe();
+}
+
+// Funzione di animazione
+function animate() {
+  requestAnimationFrame(animate);
+  globe.rotation.y += 0.00001;
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
 }
 
 // Aggiungi particelle per l'effetto
@@ -167,25 +171,35 @@ function addParticles() {
   scene.add(particleSystem);
 }
 
-// Gestione del ridimensionamento della finestra
-function onWindowResize() {
-  const containerWidth = window.innerWidth - 300; // 300px per la sidebar
-  const containerHeight = window.innerHeight;
+// Funzione per selezionare il pin
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
 
-  camera.aspect = containerWidth / containerHeight;
-  camera.updateProjectionMatrix();
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+    selectedPin.userData.label.visible = false;
+  }
 
-  renderer.setSize(containerWidth, containerHeight);
-  labelRenderer.setSize(containerWidth, containerHeight);
-}
+  pin.material.color.set('rgb(173, 216, 230)');
+  pin.userData.label.visible = true;
+  selectedPin = pin;
 
-// Funzione di animazione
-function animate() {
-  requestAnimationFrame(animate);
-  globe.rotation.y += 0.00001;
-  controls.update();
-  renderer.render(scene, camera);
-  labelRenderer.render(scene, camera);
+  const direction = pin.position.clone().normalize();
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y),
+    Math.atan2(-direction.x, direction.z),
+    0
+  );
+
+  gsap.to(globe.rotation, {
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
+    duration: 1.5,
+    ease: 'power2.inOut',
+    onUpdate: () => controls.update()
+  });
 }
 
 window.focusOnPin = focusOnPin;

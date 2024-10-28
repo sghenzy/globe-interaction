@@ -34,10 +34,11 @@ html, body {
 }
 
 canvas, .three-canvas {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover; /* Assicura che il globo riempia tutta l'area senza margini */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
+
 
 /* Nasconde la scrollbar per un aspetto più pulito */
 #side-column::-webkit-scrollbar {

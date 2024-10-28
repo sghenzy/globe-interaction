@@ -6,21 +6,25 @@ function init() {
   const container = document.getElementById('globe-container');
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x161616);
+
+  // Inizializza la camera
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
 
+  // Inizializza il renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth - 300, window.innerHeight); // Dimensione iniziale
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild(renderer.domElement);
 
-  // Aggiungi il CSS2DRenderer per supportare i testi descrittivi
+  // Inizializza il label renderer per i testi descrittivi
   labelRenderer = new THREE.CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight); // Dimensione iniziale
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0';
   container.appendChild(labelRenderer.domElement);
 
+  // Aggiungi luci alla scena
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
   scene.add(ambientLight);
 
@@ -28,6 +32,7 @@ function init() {
   directionalLight.position.set(5, 3, 5);
   scene.add(directionalLight);
 
+  // Aggiungi il globo
   const geometry = new THREE.SphereGeometry(0.6, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('img/convertite/Earth Night Map 2k.webp');
@@ -35,7 +40,10 @@ function init() {
   globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
 
+  // Aggiungi i pin
   addPins();
+
+  // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableZoom = false;
   controls.minDistance = 2.5;
@@ -46,12 +54,14 @@ function init() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
+  // Event listener per il ridimensionamento
   window.addEventListener('resize', onWindowResize);
+  onWindowResize(); // Imposta la dimensione iniziale
   addParticles();
   animate();
 }
 
-// Funzione aggiornata per posizionare correttamente 8 pin con etichette
+// Funzione per aggiungere i pin al globo
 function addPins() {
   const pinPositions = [
     { lat: 0.4, lon: 0.1, label: "Il Cairo" },
@@ -64,7 +74,7 @@ function addPins() {
     { lat: -0.1, lon: -0.1, label: "Parigi" }
   ];
 
-  const globeRadius = 0.6; // Usa la nuova dimensione del raggio della sfera
+  const globeRadius = 0.6;
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
@@ -78,51 +88,50 @@ function addPins() {
     pin.position.y = globeRadius * Math.cos(phi);
     pin.position.z = globeRadius * Math.sin(phi) * Math.sin(theta);
 
-    // Aggiungi il testo descrittivo come CSS2DObject e collegalo al pin
+    // Crea e collega il testo descrittivo al pin
     const labelDiv = document.createElement('div');
     labelDiv.className = 'pin-label';
     labelDiv.textContent = pos.label;
     labelDiv.style.color = 'white';
 
     const label = new THREE.CSS2DObject(labelDiv);
-    label.position.set(0, 0.1, 0); // Posiziona sopra il pin
-    label.visible = false; // Nascondi finché non è selezionato
+    label.position.set(0, 0.1, 0);
+    label.visible = false; // Nascondi il testo inizialmente
     pin.add(label);
 
     pin.userData.index = index;
-    pin.userData.label = label; // Associa l'oggetto CSS2D per modificarne la visibilità
+    pin.userData.label = label; // Associa l'oggetto CSS2D per modificare la visibilità
     globe.add(pin);
     pins.push(pin);
   });
 }
 
+// Funzione per ridimensionare i pin in base alla dimensione della finestra
 function updatePinSize() {
-  const scaleFactor = window.innerHeight * 0.001; // Regola in base alle tue preferenze
+  const scaleFactor = window.innerHeight * 0.001;
   pins.forEach(pin => pin.scale.set(scaleFactor, scaleFactor, scaleFactor));
 }
 
 window.addEventListener('resize', updatePinSize);
-// Funzione aggiornata per gestire la rotazione e la selezione dei pin
+
+// Funzione per ruotare e selezionare il pin
 function focusOnPin(pinIndex) {
   const pin = pins[pinIndex];
   if (!pin) return;
 
-  // Ripristina il colore e nascondi il testo del pin precedente
   if (selectedPin) {
     selectedPin.material.color.set('rgb(144, 238, 144)');
-    selectedPin.userData.label.visible = false; // Nasconde l'etichetta del pin precedente
+    selectedPin.userData.label.visible = false; // Nascondi l'etichetta del pin precedente
   }
 
-  // Cambia colore e mostra il testo del pin selezionato
-  pin.material.color.set('rgb(173, 216, 230)'); // Azzurro
+  pin.material.color.set('rgb(173, 216, 230)'); // Colore azzurro
   pin.userData.label.visible = true; // Mostra l'etichetta del pin selezionato
   selectedPin = pin;
 
-  // Calcola la rotazione necessaria per portare il pin in vista su tutti gli assi
-  const direction = pin.position.clone().normalize(); // Direzione verso il pin
+  const direction = pin.position.clone().normalize();
   const targetRotation = new THREE.Euler(
-    Math.asin(direction.y), // Ruota sull'asse X per regolare l'altezza
-    Math.atan2(-direction.x, direction.z), // Ruota sull'asse Y per regolare la rotazione orizzontale
+    Math.asin(direction.y),
+    Math.atan2(-direction.x, direction.z),
     0
   );
 
@@ -136,6 +145,7 @@ function focusOnPin(pinIndex) {
   });
 }
 
+// Aggiungi particelle per l'effetto
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
@@ -157,26 +167,25 @@ function addParticles() {
   scene.add(particleSystem);
 }
 
+// Gestione del ridimensionamento della finestra
 function onWindowResize() {
-  const aspectRatio = window.innerWidth / window.innerHeight;
-  
-  // Aggiorna la camera con il nuovo rapporto d’aspetto
-  camera.aspect = aspectRatio;
+  const containerWidth = window.innerWidth - 300; // 300px per la sidebar
+  const containerHeight = window.innerHeight;
+
+  camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
-  
-  // Ridimensiona il renderer in base alle dimensioni della finestra
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+
+  renderer.setSize(containerWidth, containerHeight);
+  labelRenderer.setSize(containerWidth, containerHeight);
 }
 
-window.addEventListener('resize', onWindowResize);
-
+// Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
   globe.rotation.y += 0.00001;
   controls.update();
   renderer.render(scene, camera);
-  labelRenderer.render(scene, camera); // Renderizza anche le etichette
+  labelRenderer.render(scene, camera);
 }
 
 window.focusOnPin = focusOnPin;

@@ -1,9 +1,26 @@
-body, html {
+html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #161616;
-  cursor: default;
+  font-family: Gotham, sans-serif;
+}
+
+#globe-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* Colonna laterale scrollabile */
@@ -56,22 +73,9 @@ body, html {
   text-align: left;
 }
 
-#globe-container {
-  width: calc(100vw - 220px); /* Spazio lasciato per la colonna laterale */
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  margin-left: 220px; /* Allinea il globo lasciando spazio alla colonna */
-  mask-image: radial-gradient(circle, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0) 80%);
-  -webkit-mask-image: radial-gradient(circle, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0) 80%);
-}
 
 /* Stili per i testi informativi (rimosso poiché non più usati) */
 .info-text {
   display: none; /* Nasconde i vecchi info box */
 }
 
-/* Stili generali per il body */
-body, html {
-  font-family: Arial, sans-serif;
-}

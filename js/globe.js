@@ -96,6 +96,12 @@ function addPins() {
   });
 }
 
+function updatePinSize() {
+  const scaleFactor = window.innerHeight * 0.001; // Regola in base alle tue preferenze
+  pins.forEach(pin => pin.scale.set(scaleFactor, scaleFactor, scaleFactor));
+}
+
+window.addEventListener('resize', updatePinSize);
 // Funzione aggiornata per gestire la rotazione e la selezione dei pin
 function focusOnPin(pinIndex) {
   const pin = pins[pinIndex];
@@ -152,11 +158,18 @@ function addParticles() {
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const aspectRatio = window.innerWidth / window.innerHeight;
+  
+  // Aggiorna la camera con il nuovo rapporto d’aspetto
+  camera.aspect = aspectRatio;
   camera.updateProjectionMatrix();
+  
+  // Ridimensiona il renderer in base alle dimensioni della finestra
   renderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+window.addEventListener('resize', onWindowResize);
 
 function animate() {
   requestAnimationFrame(animate);

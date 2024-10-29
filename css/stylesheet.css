@@ -1,6 +1,15 @@
+/* Definisci il font custom */
+@font-face {
+  font-family: 'Gotham';
+  src: url('https://sghenzy.github.io/gotham-font/GothamLight.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html, body {
   margin: 0;
   padding: 0;
+  font-family: 'Gotham', sans-serif;
   overflow: hidden;
   width: 100vw;
   height: 100vh;
@@ -14,7 +23,7 @@ html, body {
 }
 
 #side-column {
-  width: 240px; /* Larghezza fissa per la sidebar */
+  width: 550px; /* Larghezza fissa per la sidebar */
   height: 100vh;
   overflow-y: auto;
   background-color: #161616;
@@ -52,27 +61,33 @@ canvas, .three-canvas {
 
 /* Stili per gli elementi della sidebar */
 #side-column .item {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 20vh;
   align-items: center;
-  margin-bottom: 2vh;
-  background: #9CC9C6; /* Colore di fondo */
-  border-radius: 8px;
+  margin-bottom: 3vh;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 #side-column img {
   width: 100%;
-  height: 90%;
+  height: 100%;
   object-fit: cover;
 }
 
 #side-column p {
   margin: 0;
-  padding: 1vh;
-  padding-left: 1vw;
-  background: #e0e0e0;
+  padding: 2vh;
+  padding-left: 3vw;
+  font-family: 'Gotham';
+  position: absolute;
+  bottom: 0%;
+  font-size: 14px;
+  color: rgb(224, 224, 224);
+  background: rgba(22, 22, 22, 0.6); /* Colore di sfondo con trasparenza */
+  backdrop-filter: blur(4px); /* Applica un blur leggero allo sfondo */
   width: 100%;
   text-align: left;
 }
@@ -114,7 +129,7 @@ canvas, .three-canvas {
   }
 
   #side-column .item {
-    width: 40vw;
+    width: 70vw;
     height: 100%;
     margin-right: 2vw;
     flex-shrink: 0;
@@ -128,5 +143,10 @@ canvas, .three-canvas {
   #side-column {
     -ms-overflow-style: none;  /* IE e Edge */
     scrollbar-width: none;  /* Firefox */
+  }
+
+  #side-column p {
+    font-size: 14px;
+    padding-left: 10vw;
   }
 }

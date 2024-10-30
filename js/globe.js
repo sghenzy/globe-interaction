@@ -38,6 +38,9 @@ function init() {
   const earthTexture = textureLoader.load('img/convertite/Earth Night Map 2k.webp');
   const material = new THREE.MeshStandardMaterial({ map: earthTexture });
   globe = new THREE.Mesh(geometry, material);
+
+// Applica un offset leggero verso destra
+  globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
   scene.add(globe);
 
   // Aggiungi i pin

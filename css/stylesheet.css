@@ -22,14 +22,18 @@ html, body {
   height: 100vh;
 }
 
+/* Sidebar meno invasiva con effetto blur */
 #side-column {
-  width: 550px; /* Larghezza fissa per la sidebar */
-  height: 100vh;
+  width: 900px; /* Larghezza per schermi più grandi */
   overflow-y: auto;
-  background-color: #161616;
-  padding: 20px;
+  position: absolute;
+  top: 22vh;
+  left: 0;
+  z-index: 555;
+  padding-left: 3vw;
   box-sizing: border-box;
 }
+
 
 #globe-container {
   flex-grow: 1; /* Occupa tutto lo spazio rimanente */
@@ -61,35 +65,30 @@ canvas, .three-canvas {
 
 /* Stili per gli elementi della sidebar */
 #side-column .item {
-  position: relative;
   display: flex;
-  flex-direction: column;
-  height: 20vh;
-  align-items: center;
-  margin-bottom: 3vh;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-#side-column img {
+  flex-direction: row;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  gap: 2vw;
+  align-items: center;
+  overflow: hidden;
+  padding: 2vh;
 }
 
+/* Effetto di blur per ogni paragrafo singolo */
 #side-column p {
   margin: 0;
-  padding: 2vh;
-  padding-left: 3vw;
   font-family: 'Gotham';
-  position: absolute;
-  bottom: 0%;
   font-size: 14px;
   color: rgb(224, 224, 224);
-  background: rgba(22, 22, 22, 0.6); /* Colore di sfondo con trasparenza */
-  backdrop-filter: blur(4px); /* Applica un blur leggero allo sfondo */
-  width: 100%;
+  background-color: rgba(22, 22, 22, 0.4); /* Colore semitrasparente per il background */
+  backdrop-filter: blur(10px); /* Applica un blur più intenso dietro l'intera colonna */
   text-align: left;
+  border-radius: 4px; /* Arrotondamento dei bordi */
+  padding: 0.5vh 1vw; /* Padding per spazio interno */
+}
+
+#side-column .last {
+  padding-left: 3vw;
 }
 
 /* Aggiungi questo codice alla fine del file stylesheet.css */

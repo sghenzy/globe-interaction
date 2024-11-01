@@ -35,7 +35,7 @@ function init() {
   // Aggiungi il globo
   const geometry = new THREE.SphereGeometry(0.6, 64, 64);
   const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load('img/convertite/Earth Night Map 2k.webp');
+  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   const material = new THREE.MeshStandardMaterial({ map: earthTexture });
   globe = new THREE.Mesh(geometry, material);
 

@@ -22,19 +22,6 @@ html, body {
   height: 100vh;
 }
 
-/* Sidebar meno invasiva con effetto blur */
-#side-column {
-  width: 900px; /* Larghezza per schermi più grandi */
-  overflow-y: auto;
-  position: absolute;
-  top: 22vh;
-  left: 0;
-  z-index: 555;
-  padding-left: 3vw;
-  box-sizing: border-box;
-}
-
-
 #globe-container {
   flex-grow: 1; /* Occupa tutto lo spazio rimanente */
   height: 100vh;
@@ -52,44 +39,6 @@ canvas, .three-canvas {
   object-fit: contain;
 }
 
-
-/* Nasconde la scrollbar per un aspetto più pulito */
-#side-column::-webkit-scrollbar {
-  display: none;
-}
-
-#side-column {
-  -ms-overflow-style: none;  /* IE e Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-/* Stili per gli elementi della sidebar */
-#side-column .item {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  gap: 2vw;
-  align-items: center;
-  overflow: hidden;
-  padding: 2vh;
-}
-
-/* Effetto di blur per ogni paragrafo singolo */
-#side-column p {
-  margin: 0;
-  font-family: 'Gotham';
-  font-size: 14px;
-  color: rgb(224, 224, 224);
-  background-color: rgba(22, 22, 22, 0.4); /* Colore semitrasparente per il background */
-  backdrop-filter: blur(10px); /* Applica un blur più intenso dietro l'intera colonna */
-  text-align: left;
-  border-radius: 4px; /* Arrotondamento dei bordi */
-  padding: 0.5vh 1vw; /* Padding per spazio interno */
-}
-
-#side-column .last {
-  padding-left: 3vw;
-}
 
 /* Aggiungi questo codice alla fine del file stylesheet.css */
 
@@ -110,42 +59,4 @@ canvas, .three-canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  #side-column {
-    width: 100vw; /* Sidebar takes full width */
-    height: 22vh; /* Set height for row scroll */
-    display: flex;
-    position: absolute;
-    bottom: 0%;
-    left: 0%;
-    z-index: 555;
-    flex-direction: row;
-    overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: hidden;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
-
-  #side-column .item {
-    width: 70vw;
-    height: 100%;
-    margin-right: 2vw;
-    flex-shrink: 0;
-  }
-
-    /* Nasconde la scrollbar per un aspetto più pulito */
-  #side-column::-webkit-scrollbar {
-    display: none;
-  }
-
-  #side-column {
-    -ms-overflow-style: none;  /* IE e Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-
-  #side-column p {
-    font-size: 14px;
-    padding-left: 10vw;
-  }
-}
+  }ì

@@ -33,14 +33,14 @@ function init() {
   scene.add(directionalLight);
 
   // Aggiungi il globo
-  const geometry = new THREE.SphereGeometry(0.6, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   const material = new THREE.MeshStandardMaterial({ map: earthTexture });
   globe = new THREE.Mesh(geometry, material);
 
 // Applica un offset leggero verso destra
-  globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
+  // globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
   scene.add(globe);
 
   // Aggiungi i pin

@@ -77,7 +77,7 @@ function addPins() {
     { lat: -0.1, lon: -0.1, label: "Parigi" }
   ];
 
-  const globeRadius = 0.6;
+  const globeRadius = 0.5;
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); // Dimensione iniziale fissa per i pin

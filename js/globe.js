@@ -40,7 +40,7 @@ function init() {
   globe = new THREE.Mesh(geometry, material);
 
 // Applica un offset leggero verso destra
-  globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
+// globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
   scene.add(globe);
 
   // Aggiungi i pin

@@ -16,7 +16,7 @@ html, body {
   display: flex;
 }
 
-#siide-bar-bg {
+#side-bar-bg {
   background: rgba(22, 22, 22, 0.6); /* Colore di sfondo con trasparenza */
   backdrop-filter: blur(5px); /* Applica un blur leggero allo sfondo */
 }

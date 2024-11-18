@@ -1,6 +1,5 @@
 let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
 const pins = [];
-const orbits = [];
 let selectedPin = null;
 
 function init() {
@@ -85,14 +84,12 @@ function addPinsAndOrbits() {
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    // Creazione della traiettoria indipendente
+    // Creazione della traiettoria parziale
     const orbitGroup = new THREE.Group();
     scene.add(orbitGroup);
-    orbits.push(orbitGroup);
 
-    // Aggiungi traiettoria tratteggiata
-    const isPartial = index % 2 === 0;
-    addDashedOrbit(orbitGroup, globeRadius + pinOffset, phi, theta, isPartial);
+    // Aggiungi traiettoria tratteggiata che passa solo dietro al globo
+    addDashedOrbit(orbitGroup, globeRadius + pinOffset, phi, theta, true);
 
     // Aggiungi il pin alla traiettoria
     const pin = createPin(pos.label);
@@ -121,8 +118,8 @@ function createPin(labelText) {
 }
 
 function addDashedOrbit(group, radius, phi, theta, partial = false) {
-  const startAngle = partial ? Math.PI : 0;
-  const endAngle = partial ? 1.5 * Math.PI : 2 * Math.PI;
+  const startAngle = Math.PI; // Inizio dietro il globo
+  const endAngle = 1.5 * Math.PI; // Fine a metà per orbite parziali
 
   const curve = new THREE.EllipseCurve(
     0, 0,
@@ -211,7 +208,6 @@ function animate() {
   labelRenderer.render(scene, camera);
 }
 
-// Aggiungi particelle per l'effetto
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
@@ -233,7 +229,6 @@ function addParticles() {
   scene.add(particleSystem);
 }
 
-// Funzione per selezionare il pin
 function focusOnPin(pinIndex) {
   const pin = pins[pinIndex];
   if (!pin) return;

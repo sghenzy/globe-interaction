@@ -155,8 +155,6 @@ function createDashedOrbit(radius) {
     gapSize: 0.03,
     opacity: 0.4,
     transparent: true,
-    depthTest: false,   // Disabilita il test di profondità per forzare la visualizzazione dietro al globo
-    depthWrite: false   // Non scrive nella profondità per evitare conflitti con il globo
   });
 
   const orbitLine = new THREE.Line(geometry, material);

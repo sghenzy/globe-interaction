@@ -79,19 +79,21 @@ function addGlobe() {
 
 function addOrbitingPinsWithOrbits() {
   const pinPositions = [
-    { label: "Il Cairo", inclination: 0, startRotation: 0 },                // Orbita lungo l'asse X
-    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },      // Orbita inclinata di 45°
-    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },        // Orbita lungo l'asse Y
-    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },         // Orbita inclinata di 30°
-    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },          // Orbita inclinata di 60°
-    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },         // Orbita inclinata di 22.5°
-    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },       // Orbita inclinata di 15°
-    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' } // Orbita lungo l'asse Z
+    { label: "Il Cairo", inclination: 0, startRotation: 0 },
+    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
+    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },
+    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },
+    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },
+    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },
+    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },
+    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
   const orbitRadius = 0.7; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
+    console.log(`Creazione pin e orbita per: ${pos.label}`); // Debug per ogni pin
+
     // Crea un gruppo orbitale per ciascun pin
     const orbitGroup = new THREE.Group();
     orbitGroup.rotation.x = pos.inclination;
@@ -104,7 +106,7 @@ function addOrbitingPinsWithOrbits() {
 
     // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
-    pin.position.x = orbitRadius; // Posiziona il pin lungo l'asse X del gruppo orbitale
+    pin.position.x = orbitRadius;
     orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
@@ -116,11 +118,15 @@ function addOrbitingPinsWithOrbits() {
       orbitLine.rotation.y = pos.inclination;
     }
 
-    orbitLine.rotation.y += pos.startRotation; // Imposta la stessa rotazione iniziale per allineare con il pin
+    orbitLine.rotation.y += pos.startRotation;
     orbitLines.push(orbitLine);
     scene.add(orbitLine); // Aggiungi la linea di orbita alla scena
   });
+
+  console.log(`Totale pin creati: ${pins.length}`);
+  console.log(`Totale orbite create: ${orbitLines.length}`);
 }
+
 
 
 function createPin(labelText) {
@@ -143,7 +149,7 @@ function createPin(labelText) {
 
 function createDashedOrbit(radius) {
   const curve = new THREE.EllipseCurve(
-    0, 0,          // Centro dell'orbita
+    0, 0,            // Centro dell'orbita
     radius, radius,   // Raggio dell'orbita
     0, 2 * Math.PI    // Orbita completa
   );
@@ -154,14 +160,19 @@ function createDashedOrbit(radius) {
     color: 0xffffff,
     dashSize: 0.05,
     gapSize: 0.03,
-    opacity: 0.2, // Imposta l'opacità della linea per renderla meno visibile
+    opacity: 0.4,
     transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances(); // Necessario per il tratteggio
+  orbitLine.computeLineDistances();
+  
+  // Log di debug per verificare che ogni orbita sia unica
+  console.log(`Orbita creata con raggio: ${radius}`);
+  
   return orbitLine;
 }
+
 
 function onWindowResize() {
   let containerWidth = window.innerWidth;

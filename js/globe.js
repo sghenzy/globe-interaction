@@ -60,7 +60,7 @@ function init() {
 
 function addGlobe() {
   // Aumenta leggermente il raggio del globo per sovrapporsi visivamente alle orbite
-  const geometry = new THREE.SphereGeometry(0.65, 64, 64); // Cambia il raggio da 0.5 a 0.505
+  const geometry = new THREE.SphereGeometry(0.6, 64, 64); // Cambia il raggio da 0.5 a 0.505
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   

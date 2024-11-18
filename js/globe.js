@@ -33,18 +33,10 @@ function init() {
   scene.add(directionalLight);
 
   // Aggiungi il globo
-  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
-  const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
-  globe = new THREE.Mesh(geometry, material);
+  addGlobe();
 
-// Applica un offset leggero verso destra
-  // globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
-  scene.add(globe);
-
-  // Aggiungi i pin
-  addPins();
+  // Aggiungi i pin e le orbite indipendenti
+  addPinsAndOrbits();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -64,8 +56,16 @@ function init() {
   animate();
 }
 
-// Funzione per aggiungere i pin al globo
-function addPins() {
+function addGlobe() {
+  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
+  const textureLoader = new THREE.TextureLoader();
+  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
+  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
+  globe = new THREE.Mesh(geometry, material);
+  scene.add(globe);
+}
+
+function addPinsAndOrbits() {
   const pinPositions = [
     { lat: 0.4, lon: 0.1, label: "Il Cairo" },
     { lat: -0.3, lon: 0.3, label: "New York" },
@@ -81,113 +81,107 @@ function addPins() {
   const pinOffset = 0.05; // Offset dei pin dalla superficie del globo
 
   pinPositions.forEach((pos, index) => {
-    const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
-    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
-    const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
+    // Crea un gruppo per la traiettoria e il pin
+    const orbitGroup = new THREE.Group();
+    scene.add(orbitGroup);
+
+    // Crea il pin e posizionalo nel gruppo
+    const pin = createPin(pos.label);
     pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
+    orbitGroup.add(pin);
 
-    const labelDiv = document.createElement('div');
-    labelDiv.className = 'pin-label';
-    labelDiv.textContent = pos.label;
-    labelDiv.style.color = 'white';
+    // Crea la traiettoria come una linea tratteggiata e aggiungila al gruppo
+    const orbitLine = createDashedOrbit(globeRadius + pinOffset);
+    orbitLine.rotation.x = phi;
+    orbitLine.rotation.y = theta;
+    orbitGroup.add(orbitLine);
 
-    const label = new THREE.CSS2DObject(labelDiv);
-    label.position.set(0, 0.1, 0);
-    label.visible = false;
-    pin.add(label);
-
-    pin.userData.index = index;
-    pin.userData.label = label;
-    globe.add(pin);
-    pins.push(pin);
-
-    // Aggiungi traiettoria tratteggiata
-    addDashedOrbit(globeRadius + pinOffset, phi, theta);
+    pins.push({ pin, orbitGroup, phi, theta });
   });
 }
 
-function addDashedOrbit(radius, phi, theta) {
+function createPin(labelText) {
+  const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
+  const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
+  const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'pin-label';
+  labelDiv.textContent = labelText;
+  labelDiv.style.color = 'white';
+
+  const label = new THREE.CSS2DObject(labelDiv);
+  label.position.set(0, 0.1, 0);
+  label.visible = false;
+  pin.add(label);
+
+  return pin;
+}
+
+function createDashedOrbit(radius) {
   const curve = new THREE.EllipseCurve(
-    0, 0,            // x, y del centro
-    radius, radius,   // larghezza e altezza dell'ellisse
-    0, 2 * Math.PI,   // angoli di inizio e fine
-    false,            // senso orario
-    theta             // angolo di rotazione
+    0, 0,            // Centro dell'orbita
+    radius, radius,   // Raggio dell'orbita
+    0, 2 * Math.PI    // Orbita completa
   );
 
   const points = curve.getPoints(100);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.01,
-    gapSize: 0.01,
+    dashSize: 0.05,
+    gapSize: 0.03,
+    opacity: 0.2,
+    transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances(); // Necessario per il tratteggio
-  orbitLine.rotation.x = phi;
-
-  scene.add(orbitLine);
+  orbitLine.computeLineDistances();
+  return orbitLine;
 }
 
-
-// Funzione per ridimensionare solo il globo
-function resizeGlobe() {
-  const maxGlobeScale = 1;      // Scale for larger screens
-  const minGlobeScale = 0.3;    // Minimum scale for screens between 800px and 560px
-  const mobileScale = 0.6;      // Slightly larger scale for screens below 479px
-
-  const screenWidth = window.innerWidth;
-  let scaleFactor = maxGlobeScale;
-
-  // Scale down gradually for screens below 850px
-  if (screenWidth < 850) {
-    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
-    scaleFactor = Math.max(minGlobeScale, scaleFactor);
-  }
-
-  // Additional scaling for very small screens (below 479px)
-  if (screenWidth < 479) {
-    scaleFactor = mobileScale;
-  }
-
-  // Apply the scale to the globe
-  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
+// Funzione per animare i gruppi orbitali in modo indipendente
+function animatePins() {
+  const time = Date.now() * 0.0001;
+  pins.forEach(({ orbitGroup }, index) => {
+    // Ruota ogni gruppo lungo un proprio asse in base al tempo
+    orbitGroup.rotation.y = time + index * 0.1;
+  });
 }
 
-
-// Gestione del ridimensionamento della finestra
 function onWindowResize() {
   let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
 
-  // Adjust the camera aspect ratio and renderer dimensions
   camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
 
   renderer.setSize(containerWidth, containerHeight);
   labelRenderer.setSize(containerWidth, containerHeight);
 
-  // Update the globe size based on new screen size
   resizeGlobe();
 }
 
 // Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
-  globe.rotation.y += 0.00001;
+
+  // Ruota il globo sul proprio asse Y
+  globe.rotation.y += 0.001;
+
+  // Anima i pin lungo le traiettorie
+  animatePins();
+
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
 
-// Aggiungi particelle per l'effetto
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
@@ -207,37 +201,6 @@ function addParticles() {
   const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
-}
-
-// Funzione per selezionare il pin
-function focusOnPin(pinIndex) {
-  const pin = pins[pinIndex];
-  if (!pin) return;
-
-  if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-    selectedPin.userData.label.visible = false;
-  }
-
-  pin.material.color.set('rgb(173, 216, 230)');
-  pin.userData.label.visible = true;
-  selectedPin = pin;
-
-  const direction = pin.position.clone().normalize();
-  const targetRotation = new THREE.Euler(
-    Math.asin(direction.y),
-    Math.atan2(-direction.x, direction.z),
-    0
-  );
-
-  gsap.to(globe.rotation, {
-    x: targetRotation.x,
-    y: targetRotation.y,
-    z: targetRotation.z,
-    duration: 1.5,
-    ease: 'power2.inOut',
-    onUpdate: () => controls.update()
-  });
 }
 
 window.focusOnPin = focusOnPin;

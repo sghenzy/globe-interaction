@@ -203,5 +203,53 @@ function addParticles() {
   scene.add(particleSystem);
 }
 
+function resizeGlobe() {
+  const maxGlobeScale = 1;
+  const minGlobeScale = 0.3;
+  const mobileScale = 0.6;
+  const screenWidth = window.innerWidth;
+  let scaleFactor = maxGlobeScale;
+
+  if (screenWidth < 850) {
+    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
+    scaleFactor = Math.max(minGlobeScale, scaleFactor);
+  }
+  if (screenWidth < 479) {
+    scaleFactor = mobileScale;
+  }
+
+  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
+}
+
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+    selectedPin.userData.label.visible = false;
+  }
+
+  pin.material.color.set('rgb(173, 216, 230)');
+  pin.userData.label.visible = true;
+  selectedPin = pin;
+
+  const direction = pin.position.clone().normalize();
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y),
+    Math.atan2(-direction.x, direction.z),
+    0
+  );
+
+  gsap.to(globe.rotation, {
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
+    duration: 1.5,
+    ease: 'power2.inOut',
+    onUpdate: () => controls.update()
+  });
+}
+
 window.focusOnPin = focusOnPin;
 init();

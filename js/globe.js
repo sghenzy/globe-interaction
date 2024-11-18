@@ -33,10 +33,18 @@ function init() {
   scene.add(directionalLight);
 
   // Aggiungi il globo
-  addGlobe();
+  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
+  const textureLoader = new THREE.TextureLoader();
+  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
+  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
+  globe = new THREE.Mesh(geometry, material);
 
-  // Aggiungi i pin e le traiettorie
-  addPinsAndOrbits();
+// Applica un offset leggero verso destra
+  // globe.position.x = 0.5; // Aggiusta il valore per spostarlo più o meno a destra
+  scene.add(globe);
+
+  // Aggiungi i pin
+  addPins();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -56,16 +64,8 @@ function init() {
   animate();
 }
 
-function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
-  const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
-  globe = new THREE.Mesh(geometry, material);
-  scene.add(globe);
-}
-
-function addPinsAndOrbits() {
+// Funzione per aggiungere i pin al globo
+function addPins() {
   const pinPositions = [
     { lat: 0.4, lon: 0.1, label: "Il Cairo" },
     { lat: -0.3, lon: 0.3, label: "New York" },
@@ -78,125 +78,127 @@ function addPinsAndOrbits() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.3;
+  const pinOffset = 0.3; // Offset uniforme per tutti i pin e traiettorie
 
   pinPositions.forEach((pos, index) => {
+    const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
+    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' });
+    const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    // Crea il pin
-    const pin = createPin(pos.label);
-    pins.push({ pin, phi, theta, radius: globeRadius + pinOffset });
+    // Posiziona il pin esattamente sulla traiettoria orbitale con il nuovo offset
+    pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
+    pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
+    pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
 
-    // Crea la traiettoria visibile come linea tratteggiata
-    addDashedOrbit(globeRadius + pinOffset, phi, theta);
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'pin-label';
+    labelDiv.textContent = pos.label;
+    labelDiv.style.color = 'white';
+
+    const label = new THREE.CSS2DObject(labelDiv);
+    label.position.set(0, 0.1, 0);
+    label.visible = false;
+    pin.add(label);
+
+    pin.userData.index = index;
+    pin.userData.label = label;
+    globe.add(pin);
+    pins.push(pin);
+
+    // Aggiungi traiettoria parziale per i pin
+    const isPartial = index % 2 === 0; // Rende metà delle traiettorie parziali
+    addDashedOrbit(globeRadius + pinOffset, phi, theta, isPartial);
   });
 }
 
-function createPin(labelText) {
-  const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
-  const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' });
-  const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+function addDashedOrbit(radius, phi, theta, partial = false) {
+  const startAngle = partial ? Math.PI : 0; // Inizia dietro il globo per traiettorie parziali
+  const endAngle = partial ? 1.5 * Math.PI : 2 * Math.PI; // Termina a metà per orbite parziali
 
-  const labelDiv = document.createElement('div');
-  labelDiv.className = 'pin-label';
-  labelDiv.textContent = labelText;
-  labelDiv.style.color = 'white';
-
-  const label = new THREE.CSS2DObject(labelDiv);
-  label.position.set(0, 0.1, 0);
-  label.visible = false;
-  pin.add(label);
-
-  scene.add(pin);
-  return pin;
-}
-
-function addDashedOrbit(radius, phi, theta) {
   const curve = new THREE.EllipseCurve(
-    0, 0,
-    radius, radius,
-    0, 2 * Math.PI,
-    false
+    0, 0,              // Centro dell'ellisse
+    radius, radius,     // Raggio dell'ellisse basato sull'offset
+    startAngle, endAngle,  // Angoli di inizio e fine per traiettorie parziali
+    false,              // Senso orario
+    theta               // Rotazione dell'orbita
   );
 
-  const points = curve.getPoints(100);
+  const points = curve.getPoints(50);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.05,
-    gapSize: 0.03,
-    opacity: 0.2,
+    dashSize: 0.05,     // Tratti più lunghi
+    gapSize: 0.03,      // Spazi tra i tratti
+    opacity: 0.2,       // Opacità ridotta per un effetto più sottile
     transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
+  // Ruota l'orbita per allinearla con la posizione del pin
   orbitLine.rotation.x = phi;
   orbitLine.rotation.y = theta;
 
   scene.add(orbitLine);
 }
 
-function animatePins() {
-  const time = Date.now() * 0.0001;
-  pins.forEach(({ pin, phi, radius }, index) => {
-    const angle = time + index * 0.2;
-    pin.position.x = radius * Math.sin(phi) * Math.cos(angle);
-    pin.position.y = radius * Math.cos(phi);
-    pin.position.z = radius * Math.sin(phi) * Math.sin(angle);
-  });
-}
 
 // Funzione per ridimensionare solo il globo
 function resizeGlobe() {
-  const maxGlobeScale = 1;
-  const minGlobeScale = 0.3;
-  const mobileScale = 0.6;
+  const maxGlobeScale = 1;      // Scale for larger screens
+  const minGlobeScale = 0.3;    // Minimum scale for screens between 800px and 560px
+  const mobileScale = 0.6;      // Slightly larger scale for screens below 479px
+
   const screenWidth = window.innerWidth;
   let scaleFactor = maxGlobeScale;
 
+  // Scale down gradually for screens below 850px
   if (screenWidth < 850) {
     scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
     scaleFactor = Math.max(minGlobeScale, scaleFactor);
   }
+
+  // Additional scaling for very small screens (below 479px)
   if (screenWidth < 479) {
     scaleFactor = mobileScale;
   }
 
+  // Apply the scale to the globe
   globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
 }
 
+
+// Gestione del ridimensionamento della finestra
 function onWindowResize() {
   let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
 
+  // Adjust the camera aspect ratio and renderer dimensions
   camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
 
   renderer.setSize(containerWidth, containerHeight);
   labelRenderer.setSize(containerWidth, containerHeight);
 
+  // Update the globe size based on new screen size
   resizeGlobe();
 }
 
 // Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
-
-  // Ruota il globo sul proprio asse Y
-  globe.rotation.y += 0.001;
-
-  // Anima i pin lungo le traiettorie
-  animatePins();
-
+  globe.rotation.y += 0.00001;
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
 
+// Aggiungi particelle per l'effetto
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
@@ -216,6 +218,37 @@ function addParticles() {
   const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
+}
+
+// Funzione per selezionare il pin
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+    selectedPin.userData.label.visible = false;
+  }
+
+  pin.material.color.set('rgb(173, 216, 230)');
+  pin.userData.label.visible = true;
+  selectedPin = pin;
+
+  const direction = pin.position.clone().normalize();
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y),
+    Math.atan2(-direction.x, direction.z),
+    0
+  );
+
+  gsap.to(globe.rotation, {
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
+    duration: 1.5,
+    ease: 'power2.inOut',
+    onUpdate: () => controls.update()
+  });
 }
 
 window.focusOnPin = focusOnPin;

@@ -163,6 +163,26 @@ function animatePins() {
   });
 }
 
+// Funzione per ridimensionare solo il globo
+function resizeGlobe() {
+  const maxGlobeScale = 1;
+  const minGlobeScale = 0.3;
+  const mobileScale = 0.6;
+  const screenWidth = window.innerWidth;
+  let scaleFactor = maxGlobeScale;
+
+  if (screenWidth < 850) {
+    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
+    scaleFactor = Math.max(minGlobeScale, scaleFactor);
+  }
+  if (screenWidth < 479) {
+    scaleFactor = mobileScale;
+  }
+
+  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
+}
+
+// Gestione del ridimensionamento della finestra
 function onWindowResize() {
   let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
@@ -176,6 +196,7 @@ function onWindowResize() {
   resizeGlobe();
 }
 
+// Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
 
@@ -188,6 +209,59 @@ function animate() {
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
+}
+
+// Aggiungi particelle per l'effetto
+function addParticles() {
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 5000;
+  const positions = new Float32Array(particlesCount * 3);
+
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    const distance = Math.random() * 10 + 2;
+    const angle1 = Math.random() * Math.PI * 2;
+    const angle2 = Math.acos((Math.random() * 2) - 1);
+
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
+  }
+
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
+}
+
+// Funzione per selezionare il pin
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+    selectedPin.userData.label.visible = false;
+  }
+
+  pin.material.color.set('rgb(173, 216, 230)');
+  pin.userData.label.visible = true;
+  selectedPin = pin;
+
+  const direction = pin.position.clone().normalize();
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y),
+    Math.atan2(-direction.x, direction.z),
+    0
+  );
+
+  gsap.to(globe.rotation, {
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
+    duration: 1.5,
+    ease: 'power2.inOut',
+    onUpdate: () => controls.update()
+  });
 }
 
 window.focusOnPin = focusOnPin;

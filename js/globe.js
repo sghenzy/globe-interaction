@@ -59,14 +59,24 @@ function init() {
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
+  // Aumenta leggermente il raggio del globo per sovrapporsi visivamente alle orbite
+  const geometry = new THREE.SphereGeometry(0.505, 64, 64); // Cambia il raggio da 0.5 a 0.505
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
+  
+  const material = new THREE.MeshStandardMaterial({
+    map: earthTexture,
+    opacity: 1,
+    transparent: false,
+    depthWrite: true, // Assicura che il globo blocchi visivamente le linee
+    depthTest: true   // Mantieni il test di profondità per una corretta visualizzazione
+  });
+
   globe = new THREE.Mesh(geometry, material);
   
   scene.add(globe);
 }
+
 
 
 function addOrbitingPinsWithOrbits() {

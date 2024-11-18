@@ -117,15 +117,16 @@ function createPin(labelText) {
   return pin;
 }
 
-function addDashedOrbit(group, radius, phi, theta, partial = true) {
-  const startAngle = Math.PI; // Inizio dietro il globo sull'asse Z
-  const endAngle = 2 * Math.PI; // Fine completa dell'orbita
-  
+function addDashedOrbit(group, radius, phi, theta) {
+  // Angoli unici per ogni traiettoria, calcolati a partire da phi e theta
+  const startAngle = Math.PI + (theta / 2); // Inizio dietro il globo con offset basato su theta
+  const endAngle = startAngle + Math.PI;    // Arco parziale da inizio a fine
+
   const curve = new THREE.EllipseCurve(
-    0, 0,              // Centro dell'ellisse
-    radius, radius,     // Raggio dell'ellisse basato sull'offset
-    startAngle, endAngle, // Orbita completa con rotazione per nascondere la fine
-    false               // Senso orario
+    0, 0,
+    radius, radius,
+    startAngle, endAngle,
+    false
   );
 
   const points = curve.getPoints(50);
@@ -133,21 +134,22 @@ function addDashedOrbit(group, radius, phi, theta, partial = true) {
 
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.1,       // Tratti leggermente più lunghi per maggiore uniformità
-    gapSize: 0.05,       // Spazi tra i tratti
-    opacity: 0.2,        // Opacità ridotta
+    dashSize: 0.05,
+    gapSize: 0.03,
+    opacity: 0.2,
     transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
-  // Ruota la traiettoria per assicurarsi che inizio e fine siano dietro il globo
+  // Ruota la traiettoria per allinearla con la posizione unica del pin
   orbitLine.rotation.x = phi;
-  orbitLine.rotation.z = Math.PI / 2; // Ruotiamo l'intera traiettoria dietro l'asse Z
+  orbitLine.rotation.y = theta;
 
   group.add(orbitLine);
 }
+
 
 
 function animatePins() {

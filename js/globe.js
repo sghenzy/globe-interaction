@@ -78,7 +78,7 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.1; // Aumentato l'offset dei pin dalla superficie del globo
+  const pinOffset = 0.12; // Offset dei pin aumentato leggermente
 
   pinPositions.forEach((pos) => {
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);

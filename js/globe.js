@@ -67,7 +67,7 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,         // Assicura che il globo sia completamente opaco
     transparent: false, // Disabilita la trasparenza del globo
-    depthWrite: false    // Attiva la scrittura della profondità per nascondere oggetti dietro
+    depthWrite: true    // Attiva la scrittura della profondità per nascondere oggetti dietro
   });
 
   globe = new THREE.Mesh(geometry, material);

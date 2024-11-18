@@ -67,13 +67,11 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,
     transparent: false,
-    depthWrite: true
+    depthWrite: true // Assicura che il globo sia completamente opaco e blocchi la vista di oggetti dietro
   });
 
   globe = new THREE.Mesh(geometry, material);
-  
-  // Posiziona il globo leggermente in avanti sull'asse Z
-  globe.position.z = 0.03; // Valore leggermente positivo per renderlo davanti
+  globe.renderOrder = 1; // Assegna un ordine di rendering alto per disegnarlo dopo le linee
   
   scene.add(globe);
 }
@@ -158,11 +156,13 @@ function createDashedOrbit(radius) {
     gapSize: 0.03,
     opacity: 0.4,
     transparent: true,
+    depthTest: false // Disabilita il test di profondità per le linee, così sono sempre disegnate per prime
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
-  orbitLine.position.z = 0; 
+  orbitLine.renderOrder = 0; // Assegna un ordine di rendering basso
+  
   return orbitLine;
 }
 

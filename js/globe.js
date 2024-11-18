@@ -150,7 +150,7 @@ function createDashedOrbit(radius) {
     color: 0xffffff,
     dashSize: 0.05,
     gapSize: 0.03,
-    opacity: 0.4, // Imposta l'opacità della linea per renderla meno visibile
+    opacity: 0.2, // Imposta l'opacità della linea per renderla meno visibile
     transparent: true
   });
 

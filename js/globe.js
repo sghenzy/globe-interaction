@@ -156,8 +156,13 @@ function createDashedOrbit(radius) {
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances(); // Necessario per il tratteggio
+  
+  // Imposta un ordine di rendering più basso per le linee di orbita
+  orbitLine.renderOrder = 0;
+
   return orbitLine;
 }
+
 
 function onWindowResize() {
   let containerWidth = window.innerWidth;

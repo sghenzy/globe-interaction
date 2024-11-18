@@ -78,7 +78,7 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.1; // Offset aumentato per allontanare i pin dal globo
+  const pinOffset = 0.2; // Aumenta l'offset per allontanare pin e traiettorie dal globo
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
@@ -88,7 +88,7 @@ function addPins() {
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    // Posiziona il pin esattamente sulla traiettoria orbitale
+    // Posiziona il pin esattamente sulla traiettoria orbitale con il nuovo offset
     pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
@@ -108,7 +108,7 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi traiettoria orbitale con nuovo offset
+    // Aggiungi una traiettoria orbitale dedicata per ogni pin
     addDashedOrbit(globeRadius + pinOffset, phi, theta);
   });
 }
@@ -136,13 +136,12 @@ function addDashedOrbit(radius, phi, theta) {
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
-  const randomRotation = Math.random() * Math.PI * 2;
+  // Ruota l'orbita per allinearla con la posizione del pin
   orbitLine.rotation.x = phi;
-  orbitLine.rotation.y = randomRotation;
+  orbitLine.rotation.y = theta;
 
   scene.add(orbitLine);
 }
-
 
 
 

@@ -78,17 +78,16 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.3; // Offset uniforme per tutti i pin e traiettorie
+  const pinOffset = 0.05; // Offset dei pin dalla superficie del globo
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
-    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' });
+    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    // Posiziona il pin esattamente sulla traiettoria orbitale con il nuovo offset
     pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
@@ -108,41 +107,31 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi traiettoria parziale per i pin
-    const isPartial = index % 2 === 0; // Rende metà delle traiettorie parziali
-    addDashedOrbit(globeRadius + pinOffset, phi, theta, isPartial);
+    // Aggiungi traiettoria tratteggiata
+    addDashedOrbit(globeRadius + pinOffset, phi, theta);
   });
 }
 
-function addDashedOrbit(radius, phi, theta, partial = false) {
-  const startAngle = partial ? Math.PI : 0; // Inizia dietro il globo per traiettorie parziali
-  const endAngle = partial ? 1.5 * Math.PI : 2 * Math.PI; // Termina a metà per orbite parziali
-
+function addDashedOrbit(radius, phi, theta) {
   const curve = new THREE.EllipseCurve(
-    0, 0,              // Centro dell'ellisse
-    radius, radius,     // Raggio dell'ellisse basato sull'offset
-    startAngle, endAngle,  // Angoli di inizio e fine per traiettorie parziali
-    false,              // Senso orario
-    theta               // Rotazione dell'orbita
+    0, 0,            // x, y del centro
+    radius, radius,   // larghezza e altezza dell'ellisse
+    0, 2 * Math.PI,   // angoli di inizio e fine
+    false,            // senso orario
+    theta             // angolo di rotazione
   );
 
-  const points = curve.getPoints(50);
+  const points = curve.getPoints(100);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.05,     // Tratti più lunghi
-    gapSize: 0.03,      // Spazi tra i tratti
-    opacity: 0.2,       // Opacità ridotta per un effetto più sottile
-    transparent: true
+    dashSize: 0.01,
+    gapSize: 0.01,
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances();
-
-  // Ruota l'orbita per allinearla con la posizione del pin
+  orbitLine.computeLineDistances(); // Necessario per il tratteggio
   orbitLine.rotation.x = phi;
-  orbitLine.rotation.y = theta;
 
   scene.add(orbitLine);
 }

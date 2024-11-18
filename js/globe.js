@@ -65,13 +65,16 @@ function addGlobe() {
   
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,
-    opacity: 1,         // Assicura che il globo sia completamente opaco
-    transparent: false, // Disabilita la trasparenza del globo
-    depthWrite: true    // Attiva la scrittura della profondità per nascondere oggetti dietro
+    opacity: 1,
+    transparent: false,
+    depthWrite: true
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.renderOrder = 2;  // Imposta un ordine di rendering maggiore per il globo
+  
+  // Posiziona il globo leggermente in avanti sull'asse Z
+  globe.position.z = 0.01; // Valore leggermente positivo per renderlo davanti
+  
   scene.add(globe);
 }
 

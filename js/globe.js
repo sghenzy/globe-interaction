@@ -78,7 +78,7 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.25; // Offset aumentato per allontanare pin e traiettorie dal globo
+  const pinOffset = 0.3; // Offset uniforme per tutti i pin e traiettorie
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
@@ -108,34 +108,33 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi una traiettoria orbitale dedicata per ogni pin, con alcune orbite parziali
-    const partialOrbit = index % 2 === 0; // Orbita parziale per metà dei pin
-    addDashedOrbit(globeRadius + pinOffset, phi, theta, partialOrbit);
+    // Aggiungi traiettoria parziale per i pin
+    const isPartial = index % 2 === 0; // Rende metà delle traiettorie parziali
+    addDashedOrbit(globeRadius + pinOffset, phi, theta, isPartial);
   });
 }
 
 function addDashedOrbit(radius, phi, theta, partial = false) {
-  const startAngle = partial ? Math.PI / 2 : 0;  // Inizio l'orbita da metà per quelle parziali
-  const endAngle = partial ? (3 * Math.PI) / 2 : 2 * Math.PI;  // Termina a metà per orbite parziali
+  const startAngle = partial ? Math.PI : 0; // Inizia dietro il globo per traiettorie parziali
+  const endAngle = partial ? 1.5 * Math.PI : 2 * Math.PI; // Termina a metà per orbite parziali
 
   const curve = new THREE.EllipseCurve(
     0, 0,              // Centro dell'ellisse
     radius, radius,     // Raggio dell'ellisse basato sull'offset
-    startAngle, endAngle,  // Angoli di inizio e fine
+    startAngle, endAngle,  // Angoli di inizio e fine per traiettorie parziali
     false,              // Senso orario
     theta               // Rotazione dell'orbita
   );
 
-  const points = curve.getPoints(50); // Meno punti per traiettorie più sottili
+  const points = curve.getPoints(50);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.05,  // Tratti più lunghi
-    gapSize: 0.03,   // Spazi tra i tratti più lunghi
-    opacity: 0.2,    // Opacità ridotta
-    transparent: true,
-    linewidth: 0.5   // Linea più sottile
+    dashSize: 0.05,     // Tratti più lunghi
+    gapSize: 0.03,      // Spazi tra i tratti
+    opacity: 0.2,       // Opacità ridotta per un effetto più sottile
+    transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);

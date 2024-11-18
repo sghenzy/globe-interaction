@@ -65,9 +65,6 @@ function addGlobe() {
   const material = new THREE.MeshStandardMaterial({ map: earthTexture });
   globe = new THREE.Mesh(geometry, material);
   
-  // Imposta l'ordine di rendering del globo per sovrapporlo alle linee di orbita
-  globe.renderOrder = 555; // Render order alto per sovrapposizione
-  
   scene.add(globe);
 }
 
@@ -139,7 +136,7 @@ function createPin(labelText) {
 
 function createDashedOrbit(radius) {
   const curve = new THREE.EllipseCurve(
-    0, 0,            // Centro dell'orbita
+    0, 0, -2,           // Centro dell'orbita
     radius, radius,   // Raggio dell'orbita
     0, 2 * Math.PI    // Orbita completa
   );

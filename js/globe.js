@@ -66,7 +66,7 @@ function addGlobe() {
   globe = new THREE.Mesh(geometry, material);
   
   // Imposta l'ordine di rendering del globo per sovrapporlo alle linee di orbita
-  globe.position.z = 0.8; // Render order alto per sovrapposizione
+  globe.renderOrder = 555; // Render order alto per sovrapposizione
   
   scene.add(globe);
 }

@@ -73,7 +73,7 @@ function addGlobe() {
   globe = new THREE.Mesh(geometry, material);
   
   // Posiziona il globo leggermente in avanti sull'asse Z
-  globe.position.z = 0.05; // Valore leggermente positivo per renderlo davanti
+  globe.position.z = 0.03; // Valore leggermente positivo per renderlo davanti
   
   scene.add(globe);
 }
@@ -162,7 +162,7 @@ function createDashedOrbit(radius) {
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
-  orbitLine.position.z = 0.01; 
+  orbitLine.position.z = 0; 
   return orbitLine;
 }
 

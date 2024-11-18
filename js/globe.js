@@ -35,8 +35,8 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin e le orbite
-  addPinsAndOrbits();
+  // Aggiungi i pin
+  addPins();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -65,7 +65,7 @@ function addGlobe() {
   scene.add(globe);
 }
 
-function addPinsAndOrbits() {
+function addPins() {
   const pinPositions = [
     { lat: 0.4, lon: 0.1, label: "Il Cairo" },
     { lat: -0.3, lon: 0.3, label: "New York" },
@@ -78,30 +78,19 @@ function addPinsAndOrbits() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.05; // Offset dei pin dalla superficie del globo
+  const pinOffset = 0.1; // Aumentato l'offset dei pin dalla superficie del globo
 
-  pinPositions.forEach((pos, index) => {
+  pinPositions.forEach((pos) => {
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    // Crea un gruppo per la traiettoria e il pin
-    const orbitGroup = new THREE.Group();
-    scene.add(orbitGroup);
-
-    // Crea il pin e posizionalo nel gruppo
     const pin = createPin(pos.label);
     pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
-    orbitGroup.add(pin);
 
-    // Crea la traiettoria come una linea tratteggiata e aggiungila al gruppo
-    const orbitLine = createDashedOrbit(globeRadius + pinOffset);
-    orbitLine.rotation.x = phi;
-    orbitLine.rotation.y = theta;
-    orbitGroup.add(orbitLine);
-
-    pins.push({ pin, orbitGroup, phi, theta });
+    globe.add(pin);
+    pins.push(pin);
   });
 }
 
@@ -121,28 +110,6 @@ function createPin(labelText) {
   pin.add(label);
 
   return pin;
-}
-
-function createDashedOrbit(radius) {
-  const curve = new THREE.EllipseCurve(
-    0, 0,            // Centro dell'orbita
-    radius, radius,   // Raggio dell'orbita
-    0, 2 * Math.PI    // Orbita completa
-  );
-
-  const points = curve.getPoints(100);
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineDashedMaterial({
-    color: 0xffffff,
-    dashSize: 0.05,
-    gapSize: 0.03,
-    opacity: 0.2,
-    transparent: true
-  });
-
-  const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances();
-  return orbitLine;
 }
 
 function onWindowResize() {

@@ -35,7 +35,7 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin
+  // Aggiungi i pin direttamente alla scena
   addPins();
 
   // Imposta i controlli per la telecamera
@@ -89,7 +89,8 @@ function addPins() {
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
 
-    globe.add(pin);
+    // Aggiungi il pin direttamente alla scena, non al globo
+    scene.add(pin);
     pins.push(pin);
   });
 }

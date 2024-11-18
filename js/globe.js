@@ -35,7 +35,7 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin e le orbite indipendenti
+  // Aggiungi i pin e le orbite allineate
   addPinsAndOrbits();
 
   // Imposta i controlli per la telecamera
@@ -95,10 +95,8 @@ function addPinsAndOrbits() {
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
     orbitGroup.add(pin);
 
-    // Crea la traiettoria come una linea tratteggiata e aggiungila al gruppo
-    const orbitLine = createDashedOrbit(globeRadius + pinOffset);
-    orbitLine.rotation.x = phi;
-    orbitLine.rotation.y = theta;
+    // Crea la traiettoria visibile basata sul percorso effettivo del pin
+    const orbitLine = createDashedOrbit(globeRadius + pinOffset, phi, theta);
     orbitGroup.add(orbitLine);
 
     pins.push({ pin, orbitGroup, phi, theta });
@@ -123,7 +121,8 @@ function createPin(labelText) {
   return pin;
 }
 
-function createDashedOrbit(radius) {
+// Crea un'orbita visibile per ciascun pin, basata sulla sua traiettoria effettiva
+function createDashedOrbit(radius, phi, theta) {
   const curve = new THREE.EllipseCurve(
     0, 0,            // Centro dell'orbita
     radius, radius,   // Raggio dell'orbita
@@ -142,6 +141,11 @@ function createDashedOrbit(radius) {
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
+  
+  // Allinea l'orbita con i valori di phi e theta per farla corrispondere al movimento del pin
+  orbitLine.rotation.x = phi;
+  orbitLine.rotation.y = theta;
+
   return orbitLine;
 }
 

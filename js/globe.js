@@ -205,9 +205,23 @@ function animate() {
   });
 
   controls.update();
-  renderer.render(scene, camera);
+
+  // Primo passaggio: renderizza solo le orbite e i pin
+  orbitLines.forEach(line => line.visible = true);  // Mostra solo le orbite
+  globe.visible = false;                            // Nascondi temporaneamente il globo
+  renderer.autoClear = true;                        // Cancella il buffer per il primo passaggio
+  renderer.render(scene, camera);                   // Renderizza la scena con le orbite
+
+  // Secondo passaggio: renderizza solo il globo sopra le orbite
+  orbitLines.forEach(line => line.visible = false); // Nascondi le orbite
+  globe.visible = true;                             // Mostra il globo
+  renderer.autoClear = false;                       // Non cancellare il buffer del primo passaggio
+  renderer.render(scene, camera);                   // Renderizza la scena con il globo
+
+  // Renderizza le etichette se presenti
   labelRenderer.render(scene, camera);
 }
+
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

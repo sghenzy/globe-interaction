@@ -118,9 +118,8 @@ function createPin(labelText) {
 }
 
 function addDashedOrbit(group, radius, phi, theta) {
-  // Angoli unici per ogni traiettoria, calcolati a partire da phi e theta
-  const startAngle = Math.PI + (theta / 2); // Inizio dietro il globo con offset basato su theta
-  const endAngle = startAngle + Math.PI;    // Arco parziale da inizio a fine
+  const startAngle = 0;          // Orbita completa
+  const endAngle = 2 * Math.PI;  // Fine dell'orbita completa
 
   const curve = new THREE.EllipseCurve(
     0, 0,
@@ -129,7 +128,7 @@ function addDashedOrbit(group, radius, phi, theta) {
     false
   );
 
-  const points = curve.getPoints(50);
+  const points = curve.getPoints(100);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   const material = new THREE.LineDashedMaterial({
@@ -143,7 +142,7 @@ function addDashedOrbit(group, radius, phi, theta) {
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
-  // Ruota la traiettoria per allinearla con la posizione unica del pin
+  // Allinea l'orbita alla posizione del pin specifico
   orbitLine.rotation.x = phi;
   orbitLine.rotation.y = theta;
 

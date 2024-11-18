@@ -78,16 +78,17 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.05; // Offset dei pin dalla superficie del globo
+  const pinOffset = 0.1; // Offset aumentato per allontanare i pin dal globo
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
-    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' }); // Pin in bianco
+    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' });
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
+    // Posiziona il pin esattamente sulla traiettoria orbitale
     pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
     pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
     pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
@@ -107,18 +108,18 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi traiettoria tratteggiata con orientamento casuale
+    // Aggiungi traiettoria orbitale con nuovo offset
     addDashedOrbit(globeRadius + pinOffset, phi, theta);
   });
 }
 
 function addDashedOrbit(radius, phi, theta) {
   const curve = new THREE.EllipseCurve(
-    0, 0,            // x, y del centro
-    radius, radius,   // larghezza e altezza dell'ellisse
-    0, 2 * Math.PI,   // angoli di inizio e fine
-    false,            // senso orario
-    theta             // angolo di rotazione
+    0, 0,              // Centro dell'ellisse
+    radius, radius,     // Raggio dell'ellisse basato sull'offset
+    0, 2 * Math.PI,     // Angoli di inizio e fine
+    false,              // Senso orario
+    theta               // Rotazione dell'orbita
   );
 
   const points = curve.getPoints(100);
@@ -128,20 +129,20 @@ function addDashedOrbit(radius, phi, theta) {
     color: 0xffffff,
     dashSize: 0.01,
     gapSize: 0.01,
-    opacity: 0.3,    // Opacità ridotta
+    opacity: 0.3,       // Linea semi-trasparente
     transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
-  // Aggiungere una rotazione casuale per creare traiettorie orientate diversamente
   const randomRotation = Math.random() * Math.PI * 2;
   orbitLine.rotation.x = phi;
   orbitLine.rotation.y = randomRotation;
 
   scene.add(orbitLine);
 }
+
 
 
 

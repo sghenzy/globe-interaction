@@ -82,7 +82,7 @@ function addPins() {
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
-    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
+    const pinMaterial = new THREE.MeshStandardMaterial({ color: 'white' }); // Pin in bianco
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
@@ -107,7 +107,7 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi traiettoria tratteggiata
+    // Aggiungi traiettoria tratteggiata con orientamento casuale
     addDashedOrbit(globeRadius + pinOffset, phi, theta);
   });
 }
@@ -123,18 +123,26 @@ function addDashedOrbit(radius, phi, theta) {
 
   const points = curve.getPoints(100);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
     dashSize: 0.01,
     gapSize: 0.01,
+    opacity: 0.3,    // Opacità ridotta
+    transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances(); // Necessario per il tratteggio
+  orbitLine.computeLineDistances();
+
+  // Aggiungere una rotazione casuale per creare traiettorie orientate diversamente
+  const randomRotation = Math.random() * Math.PI * 2;
   orbitLine.rotation.x = phi;
+  orbitLine.rotation.y = randomRotation;
 
   scene.add(orbitLine);
 }
+
 
 
 // Funzione per ridimensionare solo il globo

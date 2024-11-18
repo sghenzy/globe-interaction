@@ -73,7 +73,7 @@ function addGlobe() {
   globe = new THREE.Mesh(geometry, material);
   
   // Posiziona il globo leggermente in avanti sull'asse Z
-  globe.position.z = 0.01; // Valore leggermente positivo per renderlo davanti
+  globe.position.z = 1; // Valore leggermente positivo per renderlo davanti
   
   scene.add(globe);
 }

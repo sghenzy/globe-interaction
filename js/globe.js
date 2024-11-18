@@ -1,5 +1,6 @@
 let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
 const pins = [];
+const orbitGroups = []; // Gruppi per i pin in orbita
 let selectedPin = null;
 
 function init() {
@@ -35,8 +36,8 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin direttamente alla scena
-  addPins();
+  // Aggiungi i pin in orbita attorno al globo
+  addOrbitingPins();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -65,33 +66,40 @@ function addGlobe() {
   scene.add(globe);
 }
 
-function addPins() {
+function addOrbitingPins() {
   const pinPositions = [
-    { lat: 0.4, lon: 0.1, label: "Il Cairo" },
-    { lat: -0.3, lon: 0.3, label: "New York" },
-    { lat: 0.2, lon: 0.6, label: "Londra" },
-    { lat: -0.4, lon: 0.9, label: "Tokyo" },
-    { lat: 0.3, lon: -0.2, label: "Roma" },
-    { lat: -0.2, lon: -0.5, label: "Mosca" },
-    { lat: 0.1, lon: -0.8, label: "Sydney" },
-    { lat: -0.1, lon: -0.1, label: "Parigi" }
+    { label: "Il Cairo", inclination: 0 },                // Orbita lungo l'asse X
+    { label: "New York", inclination: Math.PI / 4 },      // Orbita inclinata di 45°
+    { label: "Londra", inclination: Math.PI / 2 },        // Orbita lungo l'asse Y
+    { label: "Tokyo", inclination: Math.PI / 6 },         // Orbita inclinata di 30°
+    { label: "Roma", inclination: Math.PI / 3 },          // Orbita inclinata di 60°
+    { label: "Mosca", inclination: Math.PI / 8 },         // Orbita inclinata di 22.5°
+    { label: "Sydney", inclination: Math.PI / 12 },       // Orbita inclinata di 15°
+    { label: "Parigi", inclination: Math.PI / 2, axis: 'z' } // Orbita lungo l'asse Z
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.12; // Offset dei pin aumentato leggermente
+  const orbitRadius = 0.8; // Raggio dell'orbita dei pin
 
-  pinPositions.forEach((pos) => {
-    const phi = (90 - pos.lat * 180) * (Math.PI / 180);
-    const theta = (pos.lon * 360) * (Math.PI / 180);
+  pinPositions.forEach((pos, index) => {
+    // Crea un gruppo orbitale per ciascun pin
+    const orbitGroup = new THREE.Group();
 
+    // Inclinazione e asse di rotazione personalizzati
+    orbitGroup.rotation.x = pos.inclination;
+    if (pos.axis === 'z') {
+      orbitGroup.rotation.y = pos.inclination;
+    }
+
+    scene.add(orbitGroup);
+
+    // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
-    pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
-    pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
-    pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
+    pin.position.x = orbitRadius; // Posiziona il pin lungo l'asse X del gruppo orbitale
 
-    // Aggiungi il pin direttamente alla scena, non al globo
-    scene.add(pin);
+    orbitGroup.add(pin);
     pins.push(pin);
+    orbitGroups.push(orbitGroup); // Memorizza il gruppo per animare la rotazione
   });
 }
 
@@ -132,6 +140,11 @@ function animate() {
 
   // Ruota solo il globo sull'asse Y
   globe.rotation.y += 0.001;
+
+  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita
+  orbitGroups.forEach((group, index) => {
+    group.rotation.y += 0.002 + index * 0.0002; // Velocità leggermente diversa per ogni pin
+  });
 
   controls.update();
   renderer.render(scene, camera);

@@ -78,20 +78,20 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
+  const pinOffset = 0.05; // Offset dei pin dalla superficie del globo
 
   pinPositions.forEach((pos, index) => {
-    const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); // Dimensione iniziale fissa per i pin
+    const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
     const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
     const phi = (90 - pos.lat * 180) * (Math.PI / 180);
     const theta = (pos.lon * 360) * (Math.PI / 180);
 
-    pin.position.x = globeRadius * Math.sin(phi) * Math.cos(theta);
-    pin.position.y = globeRadius * Math.cos(phi);
-    pin.position.z = globeRadius * Math.sin(phi) * Math.sin(theta);
+    pin.position.x = (globeRadius + pinOffset) * Math.sin(phi) * Math.cos(theta);
+    pin.position.y = (globeRadius + pinOffset) * Math.cos(phi);
+    pin.position.z = (globeRadius + pinOffset) * Math.sin(phi) * Math.sin(theta);
 
-    // Crea e collega il testo descrittivo al pin
     const labelDiv = document.createElement('div');
     labelDiv.className = 'pin-label';
     labelDiv.textContent = pos.label;
@@ -106,8 +106,36 @@ function addPins() {
     pin.userData.label = label;
     globe.add(pin);
     pins.push(pin);
+
+    // Aggiungi traiettoria tratteggiata
+    addDashedOrbit(globeRadius + pinOffset, phi, theta);
   });
 }
+
+function addDashedOrbit(radius, phi, theta) {
+  const curve = new THREE.EllipseCurve(
+    0, 0,            // x, y del centro
+    radius, radius,   // larghezza e altezza dell'ellisse
+    0, 2 * Math.PI,   // angoli di inizio e fine
+    false,            // senso orario
+    theta             // angolo di rotazione
+  );
+
+  const points = curve.getPoints(100);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineDashedMaterial({
+    color: 0xffffff,
+    dashSize: 0.01,
+    gapSize: 0.01,
+  });
+
+  const orbitLine = new THREE.Line(geometry, material);
+  orbitLine.computeLineDistances(); // Necessario per il tratteggio
+  orbitLine.rotation.x = phi;
+
+  scene.add(orbitLine);
+}
+
 
 // Funzione per ridimensionare solo il globo
 function resizeGlobe() {

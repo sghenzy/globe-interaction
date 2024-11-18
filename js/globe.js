@@ -77,8 +77,6 @@ function addGlobe() {
   scene.add(globe);
 }
 
-
-
 function addOrbitingPinsWithOrbits() {
   const pinPositions = [
     { label: "Il Cairo", inclination: 0, startRotation: 0 },                // Orbita lungo l'asse X
@@ -91,7 +89,6 @@ function addOrbitingPinsWithOrbits() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' } // Orbita lungo l'asse Z
   ];
 
-  const globeRadius = 0.5;
   const orbitRadius = 0.7; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
@@ -108,12 +105,11 @@ function addOrbitingPinsWithOrbits() {
     // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
     pin.position.x = orbitRadius; // Posiziona il pin lungo l'asse X del gruppo orbitale
-
     orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
 
-    // Crea la linea tratteggiata per l'orbita
+    // Crea una singola linea di orbita per il pin
     const orbitLine = createDashedOrbit(orbitRadius);
     orbitLine.rotation.x = pos.inclination;
     if (pos.axis === 'z') {
@@ -125,6 +121,7 @@ function addOrbitingPinsWithOrbits() {
     scene.add(orbitLine); // Aggiungi la linea di orbita alla scena
   });
 }
+
 
 function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 

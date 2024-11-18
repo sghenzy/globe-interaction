@@ -59,7 +59,8 @@ function init() {
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.5, 64, 64);
+  // Imposta un raggio leggermente maggiore per il globo per coprire le linee
+  const geometry = new THREE.SphereGeometry(0.51, 64, 64); // Cambia il raggio da 0.5 a 0.51
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   
@@ -67,14 +68,14 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,
     transparent: false,
-    depthWrite: true // Assicura che il globo sia completamente opaco e blocchi la vista di oggetti dietro
+    depthWrite: true,
+    depthTest: true
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.renderOrder = 1; // Assegna un ordine di rendering alto per disegnarlo dopo le linee
-  
   scene.add(globe);
 }
+
 
 function addOrbitingPinsWithOrbits() {
   const pinPositions = [
@@ -156,13 +157,11 @@ function createDashedOrbit(radius) {
     gapSize: 0.03,
     opacity: 0.4,
     transparent: true,
-    depthTest: false // Disabilita il test di profondità per le linee, così sono sempre disegnate per prime
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
-  orbitLine.renderOrder = 0; // Assegna un ordine di rendering basso
-  
+  orbitLine.position.z = 0; 
   return orbitLine;
 }
 

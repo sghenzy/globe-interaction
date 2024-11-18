@@ -71,7 +71,7 @@ function addGlobe() {
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.renderOrder = 0;  // Imposta un ordine di rendering maggiore per il globo
+  globe.renderOrder = 2;  // Imposta un ordine di rendering maggiore per il globo
   scene.add(globe);
 }
 

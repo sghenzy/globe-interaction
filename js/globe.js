@@ -150,18 +150,17 @@ function createDashedOrbit(radius) {
     color: 0xffffff,
     dashSize: 0.05,
     gapSize: 0.03,
-    opacity: 0.4, // Imposta l'opacità della linea per renderla meno visibile
-    transparent: true
+    opacity: 0.4,
+    transparent: true,
+    depthTest: false // Disabilita il test di profondità per le linee
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances(); // Necessario per il tratteggio
-  
-  // Imposta un ordine di rendering più basso per le linee di orbita
-  orbitLine.renderOrder = 0;
-
+  orbitLine.computeLineDistances();
+  orbitLine.renderOrder = 0; // Assicura che sia dietro il globo
   return orbitLine;
 }
+
 
 
 function onWindowResize() {

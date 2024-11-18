@@ -85,7 +85,7 @@ function addOrbitingPinsWithOrbits() {
   ];
 
   const globeRadius = 0.5;
-  const orbitRadius = 0.3; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.5; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin

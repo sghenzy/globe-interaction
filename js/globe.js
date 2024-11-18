@@ -62,15 +62,17 @@ function addGlobe() {
   const geometry = new THREE.SphereGeometry(0.5, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  const material = new THREE.MeshStandardMaterial({ map: earthTexture });
+  
+  const material = new THREE.MeshStandardMaterial({
+    map: earthTexture,
+    opacity: 1,         // Assicura che il globo sia completamente opaco
+    transparent: false  // Disabilita la trasparenza del globo
+  });
+
   globe = new THREE.Mesh(geometry, material);
-  
-  // Imposta l'ordine di rendering del globo per sovrapporlo alle linee di orbita
-  globe.renderOrder = 1; // Render order alto per sovrapposizione
-  
+  globe.renderOrder = 1;  // Imposta un ordine di rendering maggiore per il globo
   scene.add(globe);
 }
-
 
 function addOrbitingPinsWithOrbits() {
   const pinPositions = [

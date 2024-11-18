@@ -71,7 +71,7 @@ function addGlobe() {
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.renderOrder = 1;  // Imposta un ordine di rendering maggiore per il globo
+  globe.renderOrder = 0;  // Imposta un ordine di rendering maggiore per il globo
   scene.add(globe);
 }
 
@@ -161,7 +161,7 @@ function createDashedOrbit(radius) {
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
-  orbitLine.renderOrder = 0; // Imposta l'ordine di rendering basso per le linee
+  orbitLine.renderOrder = 1; // Imposta l'ordine di rendering basso per le linee
   return orbitLine;
 }
 

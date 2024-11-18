@@ -1,4 +1,4 @@
-let scene, camera, orbitRenderer, globeRenderer, globe, controls, particleSystem, labelRenderer;
+let globeScene, orbitScene, camera, renderer, globe, controls, labelRenderer;
 const pins = [];
 const orbitGroups = [];
 const orbitLines = [];
@@ -7,26 +7,17 @@ let selectedPin = null;
 function init() {
   const container = document.getElementById('globe-container');
   
-  // Crea la scena e la telecamera
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x161616);
-
+  // Crea due scene separate
+  globeScene = new THREE.Scene();
+  orbitScene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
 
-  // Inizializza il renderer per le linee di orbita
-  orbitRenderer = new THREE.WebGLRenderer({ antialias: true });
-  orbitRenderer.setSize(window.innerWidth - 300, window.innerHeight);
-  orbitRenderer.setPixelRatio(window.devicePixelRatio);
-  container.appendChild(orbitRenderer.domElement);
-
-  // Inizializza il renderer per il globo
-  globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // alpha:true per renderlo trasparente
-  globeRenderer.setSize(window.innerWidth - 300, window.innerHeight);
-  globeRenderer.setPixelRatio(window.devicePixelRatio);
-  globeRenderer.domElement.style.position = "absolute";
-  globeRenderer.domElement.style.top = "0";
-  container.appendChild(globeRenderer.domElement);
+  // Inizializza il renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth - 300, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
 
   // Inizializza il label renderer per i testi descrittivi
   labelRenderer = new THREE.CSS2DRenderer();
@@ -35,22 +26,22 @@ function init() {
   labelRenderer.domElement.style.top = '0';
   container.appendChild(labelRenderer.domElement);
 
-  // Aggiungi luci alla scena
+  // Aggiungi luci alla scena del globo
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-  scene.add(ambientLight);
+  globeScene.add(ambientLight);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
   directionalLight.position.set(5, 3, 5);
-  scene.add(directionalLight);
+  globeScene.add(directionalLight);
 
-  // Aggiungi il globo
+  // Aggiungi il globo alla scena del globo
   addGlobe();
 
-  // Aggiungi i pin in orbita attorno al globo con traiettorie visibili
+  // Aggiungi i pin e le orbite alla scena delle orbite
   addOrbitingPinsWithOrbits();
 
   // Imposta i controlli per la telecamera
-  controls = new THREE.OrbitControls(camera, globeRenderer.domElement);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableZoom = false;
   controls.minDistance = 2.5;
   controls.maxDistance = 2.5;
@@ -75,12 +66,11 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,
     transparent: false,
-    depthWrite: true,
-    depthTest: true
+    depthWrite: true
   });
 
   globe = new THREE.Mesh(geometry, material);
-  scene.add(globe);
+  globeScene.add(globe);
 }
 
 function createDashedOrbit(radius) {
@@ -98,13 +88,54 @@ function createDashedOrbit(radius) {
     gapSize: 0.03,
     opacity: 0.4,
     transparent: true,
-    depthWrite: true,
-    depthTest: true
+    depthWrite: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
   return orbitLine;
+}
+
+function addOrbitingPinsWithOrbits() {
+  const pinPositions = [
+    { label: "Il Cairo", inclination: 0, startRotation: 0 },
+    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
+    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },
+    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },
+    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },
+    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },
+    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },
+    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
+  ];
+
+  const orbitRadius = 0.6;
+
+  pinPositions.forEach((pos, index) => {
+    const orbitGroup = new THREE.Group();
+    orbitGroup.rotation.x = pos.inclination;
+    if (pos.axis === 'z') {
+      orbitGroup.rotation.y = pos.inclination;
+    }
+
+    orbitGroup.rotation.y += pos.startRotation;
+    orbitScene.add(orbitGroup);
+
+    const pin = createPin(pos.label);
+    pin.position.x = orbitRadius;
+    orbitGroup.add(pin);
+    pins.push(pin);
+    orbitGroups.push(orbitGroup);
+
+    const orbitLine = createDashedOrbit(orbitRadius);
+    orbitLine.rotation.x = pos.inclination;
+    if (pos.axis === 'z') {
+      orbitLine.rotation.y = pos.inclination;
+    }
+
+    orbitLine.rotation.y += pos.startRotation;
+    orbitLines.push(orbitLine);
+    orbitScene.add(orbitLine);
+  });
 }
 
 function animate() {
@@ -119,12 +150,14 @@ function animate() {
 
   controls.update();
 
-  // Primo passaggio: renderizza le linee di orbita
-  orbitRenderer.render(scene, camera);
+  // Primo passaggio: renderizza la scena delle orbite
+  renderer.autoClear = true;
+  renderer.render(orbitScene, camera);
 
-  // Secondo passaggio: renderizza il globo sopra
-  globeRenderer.render(scene, camera);
-  labelRenderer.render(scene, camera);
+  // Secondo passaggio: renderizza la scena del globo sopra
+  renderer.autoClear = false;
+  renderer.render(globeScene, camera);
+  labelRenderer.render(globeScene, camera);
 }
 
 function onWindowResize() {
@@ -134,8 +167,7 @@ function onWindowResize() {
   camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
 
-  orbitRenderer.setSize(containerWidth, containerHeight);
-  globeRenderer.setSize(containerWidth, containerHeight);
+  renderer.setSize(containerWidth, containerHeight);
   labelRenderer.setSize(containerWidth, containerHeight);
 }
 

@@ -176,7 +176,12 @@ function animate() {
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {
-    group.rotation.y += 0.0005 + index * 0.00005; // Velocità ridotta per un'orbita più lenta
+    const orbitLine = orbitLines[index];
+    const rotationSpeed = 0.0005 + index * 0.00005;
+
+    // Ruota il gruppo orbitale (che contiene il pin) e la linea d'orbita
+    group.rotation.y += rotationSpeed;
+    orbitLine.rotation.y += rotationSpeed; // Mantieni la linea d'orbita sincronizzata
   });
 
   controls.update();

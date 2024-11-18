@@ -175,7 +175,7 @@ function createDashedOrbit(radius) {
     const distanceToGlobe = camera.position.distanceTo(globe.position);
 
     // Regola l'opacità delle linee se sono più vicine alla telecamera del globo
-    material.opacity = distanceToCamera < distanceToGlobe ? 0.1 : 0.4;
+    material.opacity = distanceToCamera < distanceToGlobe ? 0.0 : 0.4;
   };
 
   return orbitLine;

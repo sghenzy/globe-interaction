@@ -78,7 +78,7 @@ function addPins() {
   ];
 
   const globeRadius = 0.5;
-  const pinOffset = 0.2; // Aumenta l'offset per allontanare pin e traiettorie dal globo
+  const pinOffset = 0.25; // Offset aumentato per allontanare pin e traiettorie dal globo
 
   pinPositions.forEach((pos, index) => {
     const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
@@ -108,29 +108,34 @@ function addPins() {
     globe.add(pin);
     pins.push(pin);
 
-    // Aggiungi una traiettoria orbitale dedicata per ogni pin
-    addDashedOrbit(globeRadius + pinOffset, phi, theta);
+    // Aggiungi una traiettoria orbitale dedicata per ogni pin, con alcune orbite parziali
+    const partialOrbit = index % 2 === 0; // Orbita parziale per metà dei pin
+    addDashedOrbit(globeRadius + pinOffset, phi, theta, partialOrbit);
   });
 }
 
-function addDashedOrbit(radius, phi, theta) {
+function addDashedOrbit(radius, phi, theta, partial = false) {
+  const startAngle = partial ? Math.PI / 2 : 0;  // Inizio l'orbita da metà per quelle parziali
+  const endAngle = partial ? (3 * Math.PI) / 2 : 2 * Math.PI;  // Termina a metà per orbite parziali
+
   const curve = new THREE.EllipseCurve(
     0, 0,              // Centro dell'ellisse
     radius, radius,     // Raggio dell'ellisse basato sull'offset
-    0, 2 * Math.PI,     // Angoli di inizio e fine
+    startAngle, endAngle,  // Angoli di inizio e fine
     false,              // Senso orario
     theta               // Rotazione dell'orbita
   );
 
-  const points = curve.getPoints(100);
+  const points = curve.getPoints(50); // Meno punti per traiettorie più sottili
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.01,
-    gapSize: 0.01,
-    opacity: 0.3,       // Linea semi-trasparente
-    transparent: true
+    dashSize: 0.05,  // Tratti più lunghi
+    gapSize: 0.03,   // Spazi tra i tratti più lunghi
+    opacity: 0.2,    // Opacità ridotta
+    transparent: true,
+    linewidth: 0.5   // Linea più sottile
   });
 
   const orbitLine = new THREE.Line(geometry, material);
@@ -142,7 +147,6 @@ function addDashedOrbit(radius, phi, theta) {
 
   scene.add(orbitLine);
 }
-
 
 
 // Funzione per ridimensionare solo il globo

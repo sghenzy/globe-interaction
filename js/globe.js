@@ -64,53 +64,53 @@ function addGlobe() {
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   const material = new THREE.MeshStandardMaterial({ map: earthTexture });
   globe = new THREE.Mesh(geometry, material);
-  globe.renderOrder = 1;  // Assegna un livello di rendering maggiore per il globo
   scene.add(globe);
 }
 
 function addOrbitingPinsWithOrbits() {
   const pinPositions = [
-    { label: "Il Cairo", inclination: 0, startRotation: 0 },
-    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
-    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },
-    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },
-    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },
-    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },
-    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },
-    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
+    { label: "Il Cairo", inclination: 0, startRotation: 0 },                // Orbita lungo l'asse X
+    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },      // Orbita inclinata di 45°
+    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },        // Orbita lungo l'asse Y
+    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },         // Orbita inclinata di 30°
+    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },          // Orbita inclinata di 60°
+    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },         // Orbita inclinata di 22.5°
+    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },       // Orbita inclinata di 15°
+    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' } // Orbita lungo l'asse Z
   ];
 
-  const orbitRadius = 0.6;
+  const globeRadius = 0.5;
+  const orbitRadius = 0.6; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
+    // Crea un gruppo orbitale per ciascun pin
     const orbitGroup = new THREE.Group();
     orbitGroup.rotation.x = pos.inclination;
     if (pos.axis === 'z') {
       orbitGroup.rotation.y = pos.inclination;
     }
 
-    orbitGroup.rotation.y += pos.startRotation;
+    orbitGroup.rotation.y += pos.startRotation; // Inizializzazione unica
     scene.add(orbitGroup);
 
+    // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
-    pin.userData = {
-      progress: 0,  // Traccia il progresso dell'orbita
-      orbitRadius: orbitRadius,
-      orbitSpeed: 0.001 + index * 0.0002  // Velocità di spostamento lungo l'orbita
-    };
+    pin.position.x = orbitRadius; // Posiziona il pin lungo l'asse X del gruppo orbitale
+
     orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
 
+    // Crea la linea tratteggiata per l'orbita
     const orbitLine = createDashedOrbit(orbitRadius);
     orbitLine.rotation.x = pos.inclination;
     if (pos.axis === 'z') {
       orbitLine.rotation.y = pos.inclination;
     }
 
-    orbitLine.rotation.y += pos.startRotation;
+    orbitLine.rotation.y += pos.startRotation; // Imposta la stessa rotazione iniziale per allineare con il pin
     orbitLines.push(orbitLine);
-    scene.add(orbitLine);
+    scene.add(orbitLine); // Aggiungi la linea di orbita alla scena
   });
 }
 
@@ -150,7 +150,7 @@ function createDashedOrbit(radius) {
   });
 
   const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances();
+  orbitLine.computeLineDistances(); // Necessario per il tratteggio
   return orbitLine;
 }
 
@@ -167,25 +167,21 @@ function onWindowResize() {
   resizeGlobe();
 }
 
+// Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
 
+  // Ruota solo il globo sull'asse Y
   globe.rotation.y += 0.001;
 
+  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {
-    const pin = pins[index];
     const orbitLine = orbitLines[index];
     const rotationSpeed = 0.0005 + index * 0.00005;
 
+    // Ruota il gruppo orbitale (che contiene il pin) e la linea d'orbita
     group.rotation.y += rotationSpeed;
-    orbitLine.rotation.y += rotationSpeed;
-
-    pin.userData.progress += pin.userData.orbitSpeed;
-    if (pin.userData.progress >= 1) pin.userData.progress = 0;
-
-    const angle = pin.userData.progress * 2 * Math.PI;
-    pin.position.x = pin.userData.orbitRadius * Math.cos(angle);
-    pin.position.z = pin.userData.orbitRadius * Math.sin(angle);
+    orbitLine.rotation.y += rotationSpeed; // Mantieni la linea d'orbita sincronizzata
   });
 
   controls.update();

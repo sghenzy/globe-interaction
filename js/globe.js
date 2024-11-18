@@ -117,16 +117,15 @@ function createPin(labelText) {
   return pin;
 }
 
-function addDashedOrbit(group, radius, phi, theta, partial = false) {
-  const startAngle = Math.PI; // Inizio dietro il globo
-  const endAngle = 1.5 * Math.PI; // Fine a metà per orbite parziali
-
+function addDashedOrbit(group, radius, phi, theta, partial = true) {
+  const startAngle = Math.PI; // Inizio dietro il globo sull'asse Z
+  const endAngle = 2 * Math.PI; // Fine completa dell'orbita
+  
   const curve = new THREE.EllipseCurve(
-    0, 0,
-    radius, radius,
-    startAngle, endAngle,
-    false,
-    theta
+    0, 0,              // Centro dell'ellisse
+    radius, radius,     // Raggio dell'ellisse basato sull'offset
+    startAngle, endAngle, // Orbita completa con rotazione per nascondere la fine
+    false               // Senso orario
   );
 
   const points = curve.getPoints(50);
@@ -134,20 +133,22 @@ function addDashedOrbit(group, radius, phi, theta, partial = false) {
 
   const material = new THREE.LineDashedMaterial({
     color: 0xffffff,
-    dashSize: 0.05,
-    gapSize: 0.03,
-    opacity: 0.2,
+    dashSize: 0.1,       // Tratti leggermente più lunghi per maggiore uniformità
+    gapSize: 0.05,       // Spazi tra i tratti
+    opacity: 0.2,        // Opacità ridotta
     transparent: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
 
+  // Ruota la traiettoria per assicurarsi che inizio e fine siano dietro il globo
   orbitLine.rotation.x = phi;
-  orbitLine.rotation.y = theta;
+  orbitLine.rotation.z = Math.PI / 2; // Ruotiamo l'intera traiettoria dietro l'asse Z
 
   group.add(orbitLine);
 }
+
 
 function animatePins() {
   const time = Date.now() * 0.0001;

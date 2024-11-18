@@ -149,9 +149,9 @@ function createPin(labelText) {
 
 function createDashedOrbit(radius) {
   const curve = new THREE.EllipseCurve(
-    0, 0,            // Centro dell'orbita
-    radius, radius,   // Raggio dell'orbita
-    0, 2 * Math.PI    // Orbita completa
+    0, 0,            
+    radius, radius,   
+    0, 2 * Math.PI    
   );
 
   const points = curve.getPoints(100);
@@ -160,18 +160,27 @@ function createDashedOrbit(radius) {
     color: 0xffffff,
     dashSize: 0.05,
     gapSize: 0.03,
-    opacity: 0.4,
-    transparent: true
+    opacity: 0.4, // Opacità di base della linea
+    transparent: true,
+    depthWrite: false, // Evita interferenze di profondità
+    depthTest: true
   });
 
   const orbitLine = new THREE.Line(geometry, material);
   orbitLine.computeLineDistances();
-  
-  // Log di debug per verificare che ogni orbita sia unica
-  console.log(`Orbita creata con raggio: ${radius}`);
-  
+
+  // Aggiunge un comportamento personalizzato per regolare l'opacità in base alla posizione
+  orbitLine.onBeforeRender = function(renderer, scene, camera, geometry, material) {
+    const distanceToCamera = camera.position.distanceTo(orbitLine.position);
+    const distanceToGlobe = camera.position.distanceTo(globe.position);
+
+    // Regola l'opacità delle linee se sono più vicine alla telecamera del globo
+    material.opacity = distanceToCamera < distanceToGlobe ? 0.1 : 0.4;
+  };
+
   return orbitLine;
 }
+
 
 
 function onWindowResize() {
@@ -205,23 +214,9 @@ function animate() {
   });
 
   controls.update();
-
-  // Primo passaggio: renderizza solo le orbite e i pin
-  orbitLines.forEach(line => line.visible = true);  // Mostra solo le orbite
-  globe.visible = false;                            // Nascondi temporaneamente il globo
-  renderer.autoClear = true;                        // Cancella il buffer per il primo passaggio
-  renderer.render(scene, camera);                   // Renderizza la scena con le orbite
-
-  // Secondo passaggio: renderizza solo il globo sopra le orbite
-  orbitLines.forEach(line => line.visible = false); // Nascondi le orbite
-  globe.visible = true;                             // Mostra il globo
-  renderer.autoClear = false;                       // Non cancellare il buffer del primo passaggio
-  renderer.render(scene, camera);                   // Renderizza la scena con il globo
-
-  // Renderizza le etichette se presenti
+  renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
-
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

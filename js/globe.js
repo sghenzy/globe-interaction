@@ -1,6 +1,7 @@
 let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
 const pins = [];
 const orbitGroups = []; // Gruppi per i pin in orbita
+const orbitLines = []; // Linee di orbita tratteggiate
 let selectedPin = null;
 
 function init() {
@@ -36,8 +37,8 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin in orbita attorno al globo
-  addOrbitingPins();
+  // Aggiungi i pin in orbita attorno al globo con traiettorie visibili
+  addOrbitingPinsWithOrbits();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -66,7 +67,7 @@ function addGlobe() {
   scene.add(globe);
 }
 
-function addOrbitingPins() {
+function addOrbitingPinsWithOrbits() {
   const pinPositions = [
     { label: "Il Cairo", inclination: 0, startRotation: 0 },                // Orbita lungo l'asse X
     { label: "New York", inclination: Math.PI / 4, startRotation: 1 },      // Orbita inclinata di 45°
@@ -79,21 +80,17 @@ function addOrbitingPins() {
   ];
 
   const globeRadius = 0.5;
-  const orbitRadius = 0.6; // Ridotto ulteriormente per avvicinare i pin al globo
+  const orbitRadius = 0.6; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin
     const orbitGroup = new THREE.Group();
-
-    // Inclinazione e asse di rotazione personalizzati
     orbitGroup.rotation.x = pos.inclination;
     if (pos.axis === 'z') {
       orbitGroup.rotation.y = pos.inclination;
     }
 
-    // Imposta una rotazione iniziale unica per ogni gruppo
-    orbitGroup.rotation.y += pos.startRotation;
-
+    orbitGroup.rotation.y += pos.startRotation; // Inizializzazione unica
     scene.add(orbitGroup);
 
     // Crea il pin e posizionalo nel gruppo orbitale
@@ -102,7 +99,18 @@ function addOrbitingPins() {
 
     orbitGroup.add(pin);
     pins.push(pin);
-    orbitGroups.push(orbitGroup); // Memorizza il gruppo per animare la rotazione
+    orbitGroups.push(orbitGroup);
+
+    // Crea la linea tratteggiata per l'orbita
+    const orbitLine = createDashedOrbit(orbitRadius);
+    orbitLine.rotation.x = pos.inclination;
+    if (pos.axis === 'z') {
+      orbitLine.rotation.y = pos.inclination;
+    }
+
+    orbitLine.rotation.y += pos.startRotation; // Imposta la stessa rotazione iniziale per allineare con il pin
+    orbitLines.push(orbitLine);
+    scene.add(orbitLine); // Aggiungi la linea di orbita alla scena
   });
 }
 
@@ -122,6 +130,28 @@ function createPin(labelText) {
   pin.add(label);
 
   return pin;
+}
+
+function createDashedOrbit(radius) {
+  const curve = new THREE.EllipseCurve(
+    0, 0,            // Centro dell'orbita
+    radius, radius,   // Raggio dell'orbita
+    0, 2 * Math.PI    // Orbita completa
+  );
+
+  const points = curve.getPoints(100);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineDashedMaterial({
+    color: 0xffffff,
+    dashSize: 0.05,
+    gapSize: 0.03,
+    opacity: 0.4, // Imposta l'opacità della linea per renderla meno visibile
+    transparent: true
+  });
+
+  const orbitLine = new THREE.Line(geometry, material);
+  orbitLine.computeLineDistances(); // Necessario per il tratteggio
+  return orbitLine;
 }
 
 function onWindowResize() {

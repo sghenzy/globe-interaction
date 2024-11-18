@@ -140,7 +140,7 @@ function createPin(labelText) {
 function createDashedOrbit(radius) {
   const curve = new THREE.EllipseCurve(
     0, 0,            // Centro dell'orbita
-    radius, radius,   // Raggio dell'orbita
+    0.4, 0.4,   // Raggio dell'orbita
     0, 2 * Math.PI    // Orbita completa
   );
 

@@ -68,18 +68,18 @@ function addGlobe() {
 
 function addOrbitingPins() {
   const pinPositions = [
-    { label: "Il Cairo", inclination: 0 },                // Orbita lungo l'asse X
-    { label: "New York", inclination: Math.PI / 4 },      // Orbita inclinata di 45°
-    { label: "Londra", inclination: Math.PI / 2 },        // Orbita lungo l'asse Y
-    { label: "Tokyo", inclination: Math.PI / 6 },         // Orbita inclinata di 30°
-    { label: "Roma", inclination: Math.PI / 3 },          // Orbita inclinata di 60°
-    { label: "Mosca", inclination: Math.PI / 8 },         // Orbita inclinata di 22.5°
-    { label: "Sydney", inclination: Math.PI / 12 },       // Orbita inclinata di 15°
-    { label: "Parigi", inclination: Math.PI / 2, axis: 'z' } // Orbita lungo l'asse Z
+    { label: "Il Cairo", inclination: 0, startRotation: 0 },                // Orbita lungo l'asse X
+    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },      // Orbita inclinata di 45°
+    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },        // Orbita lungo l'asse Y
+    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },         // Orbita inclinata di 30°
+    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },          // Orbita inclinata di 60°
+    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },         // Orbita inclinata di 22.5°
+    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },       // Orbita inclinata di 15°
+    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' } // Orbita lungo l'asse Z
   ];
 
   const globeRadius = 0.5;
-  const orbitRadius = 0.8; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.7; // Ridotto per avvicinare i pin al globo
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin
@@ -90,6 +90,9 @@ function addOrbitingPins() {
     if (pos.axis === 'z') {
       orbitGroup.rotation.y = pos.inclination;
     }
+
+    // Imposta una rotazione iniziale unica per ogni gruppo
+    orbitGroup.rotation.y += pos.startRotation;
 
     scene.add(orbitGroup);
 
@@ -141,9 +144,9 @@ function animate() {
   // Ruota solo il globo sull'asse Y
   globe.rotation.y += 0.001;
 
-  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita
+  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {
-    group.rotation.y += 0.002 + index * 0.0002; // Velocità leggermente diversa per ogni pin
+    group.rotation.y += 0.0005 + index * 0.00005; // Velocità ridotta per un'orbita più lenta
   });
 
   controls.update();

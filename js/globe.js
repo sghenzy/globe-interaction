@@ -79,7 +79,7 @@ function addOrbitingPins() {
   ];
 
   const globeRadius = 0.5;
-  const orbitRadius = 0.7; // Ridotto per avvicinare i pin al globo
+  const orbitRadius = 0.6; // Ridotto ulteriormente per avvicinare i pin al globo
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin

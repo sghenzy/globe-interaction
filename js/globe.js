@@ -250,7 +250,7 @@ function focusOnPin(pinIndex) {
 
   // Ripristina lo stato del pin precedentemente selezionato
   if (selectedPin) {
-    selectedPin.material.color.set('rgb(255, 255, 0)'); // Giallo per i pin non selezionati
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Verde per i pin non selezionati
     selectedPin.userData.label.visible = false; // Nasconde l'etichetta precedente
   }
 

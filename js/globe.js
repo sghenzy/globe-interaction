@@ -1,7 +1,6 @@
 let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
 const pins = [];
 const orbitGroups = []; // Gruppi per i pin in orbita
-const orbitLines = []; // Linee di orbita tratteggiate
 let selectedPin = null;
 
 function init() {
@@ -37,8 +36,8 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
-  // Aggiungi i pin in orbita attorno al globo con traiettorie visibili
-  addOrbitingPinsWithOrbits();
+  // Aggiungi i pin in orbita attorno al globo (senza le linee tratteggiate)
+  addOrbitingPins();
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -59,8 +58,7 @@ function init() {
 }
 
 function addGlobe() {
-  // Aumenta leggermente il raggio del globo per sovrapporsi visivamente alle orbite
-  const geometry = new THREE.SphereGeometry(0.6, 64, 64); // Cambia il raggio da 0.5 a 0.505
+  const geometry = new THREE.SphereGeometry(0.6, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   
@@ -68,16 +66,15 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,
     transparent: false,
-    depthWrite: true, // Assicura che il globo blocchi visivamente le linee
+    depthWrite: true, // Assicura che il globo blocchi visivamente gli oggetti dietro
     depthTest: true   // Mantieni il test di profondità per una corretta visualizzazione
   });
 
   globe = new THREE.Mesh(geometry, material);
-  
   scene.add(globe);
 }
 
-function addOrbitingPinsWithOrbits() {
+function addOrbitingPins() {
   const pinPositions = [
     { label: "Il Cairo", inclination: 0, startRotation: 0 },
     { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
@@ -92,8 +89,6 @@ function addOrbitingPinsWithOrbits() {
   const orbitRadius = 0.7; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
-    console.log(`Creazione pin e orbita per: ${pos.label}`); // Debug per ogni pin
-
     // Crea un gruppo orbitale per ciascun pin
     const orbitGroup = new THREE.Group();
     orbitGroup.rotation.x = pos.inclination;
@@ -110,24 +105,10 @@ function addOrbitingPinsWithOrbits() {
     orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
-
-    // Crea una singola linea di orbita per il pin
-    const orbitLine = createDashedOrbit(orbitRadius);
-    orbitLine.rotation.x = pos.inclination;
-    if (pos.axis === 'z') {
-      orbitLine.rotation.y = pos.inclination;
-    }
-
-    orbitLine.rotation.y += pos.startRotation;
-    orbitLines.push(orbitLine);
-    scene.add(orbitLine); // Aggiungi la linea di orbita alla scena
   });
 
   console.log(`Totale pin creati: ${pins.length}`);
-  console.log(`Totale orbite create: ${orbitLines.length}`);
 }
-
-
 
 function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
@@ -147,42 +128,6 @@ function createPin(labelText) {
   return pin;
 }
 
-function createDashedOrbit(radius) {
-  const curve = new THREE.EllipseCurve(
-    0, 0,            
-    radius, radius,   
-    0, 2 * Math.PI    
-  );
-
-  const points = curve.getPoints(100);
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineDashedMaterial({
-    color: 0xffffff,
-    dashSize: 0.05,
-    gapSize: 0.03,
-    opacity: 0.4, // Opacità di base della linea
-    transparent: true,
-    depthWrite: false, // Evita interferenze di profondità
-    depthTest: true
-  });
-
-  const orbitLine = new THREE.Line(geometry, material);
-  orbitLine.computeLineDistances();
-
-  // Aggiunge un comportamento personalizzato per regolare l'opacità in base alla posizione
-  orbitLine.onBeforeRender = function(renderer, scene, camera, geometry, material) {
-    const distanceToCamera = camera.position.distanceTo(orbitLine.position);
-    const distanceToGlobe = camera.position.distanceTo(globe.position);
-
-    // Regola l'opacità delle linee se sono più vicine alla telecamera del globo
-    material.opacity = distanceToCamera < distanceToGlobe ? 0.0 : 0.4;
-  };
-
-  return orbitLine;
-}
-
-
-
 function onWindowResize() {
   let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
@@ -196,7 +141,6 @@ function onWindowResize() {
   resizeGlobe();
 }
 
-// Funzione di animazione
 function animate() {
   requestAnimationFrame(animate);
 
@@ -205,12 +149,10 @@ function animate() {
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {
-    const orbitLine = orbitLines[index];
     const rotationSpeed = 0.0005 + index * 0.00005;
 
-    // Ruota il gruppo orbitale (che contiene il pin) e la linea d'orbita
+    // Ruota il gruppo orbitale (che contiene il pin)
     group.rotation.y += rotationSpeed;
-    orbitLine.rotation.y += rotationSpeed; // Mantieni la linea d'orbita sincronizzata
   });
 
   controls.update();

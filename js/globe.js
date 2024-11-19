@@ -259,34 +259,49 @@ function focusOnPin(pinIndex) {
   pin.userData.label.visible = true; // Mostra l'etichetta del nuovo pin
   selectedPin = pin; // Aggiorna il riferimento al pin selezionato
 
-  // Ottieni il gruppo orbitale associato al pin
-  const orbitGroup = pin.userData.orbitGroup;
+  // Calcola la direzione del pin selezionato
+  const pinWorldPosition = new THREE.Vector3();
+  pin.getWorldPosition(pinWorldPosition); // Ottieni la posizione globale del pin
 
-  // Calcola la rotazione obiettivo del gruppo orbitale
-  const targetRotation = orbitGroup.rotation.y;
+  // Calcola la direzione normalizzata verso il pin
+  const direction = pinWorldPosition.clone().normalize();
 
-  // Anima la rotazione del globo verso il gruppo orbitale
+  // Calcola la rotazione obiettivo per centrare il pin
+  const targetRotation = new THREE.Euler(
+    Math.asin(direction.y), // Rotazione sull'asse X
+    Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
+    0 // Nessuna rotazione sull'asse Z
+  );
+
+  // Anima la rotazione del globo per centrare il pin
   gsap.to(globe.rotation, {
-    y: targetRotation,
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
     duration: 1.5,
     ease: 'power2.inOut'
   });
 
-  // Anima la rotazione del livello delle nuvole per sincronizzarlo
+  // Sincronizza il livello delle nuvole
   gsap.to(cloudLayer.rotation, {
-    y: targetRotation,
-    duration: 1.7, // Leggermente più lento per un effetto fluido
+    x: targetRotation.x,
+    y: targetRotation.y,
+    z: targetRotation.z,
+    duration: 1.5,
     ease: 'power2.inOut'
   });
 
-  // Anima la rotazione del gruppo orbitale per centrare il pin
-  gsap.to(orbitGroup.rotation, {
-    y: 0, // Porta il pin selezionato nella posizione centrale
-    duration: 1.5,
-    ease: 'power2.inOut'
+  // Sincronizza i gruppi orbitali dei pin
+  orbitGroups.forEach((group) => {
+    gsap.to(group.rotation, {
+      x: targetRotation.x,
+      y: targetRotation.y,
+      z: targetRotation.z,
+      duration: 1.5,
+      ease: 'power2.inOut'
+    });
   });
 }
-
 
 window.focusOnPin = focusOnPin;
 init();

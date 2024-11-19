@@ -243,6 +243,7 @@ function resizeGlobe() {
 
   globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
 }
+
 function focusOnPin(pinIndex) {
   const pin = pins[pinIndex];
   if (!pin) return;
@@ -262,20 +263,24 @@ function focusOnPin(pinIndex) {
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition);
 
-  // Normalizza la posizione del pin per ottenere la direzione rispetto al centro
+  // Normalizza la posizione per ottenere la direzione verso il centro del globo
   const direction = pinWorldPosition.clone().normalize();
 
-  // Verifica se il pin è "dietro" il globo
+  // Determina se il pin è dietro il globo
   const isBehind = pinWorldPosition.z < 0;
 
-  // Calcola la rotazione target per allineare il pin all'asse Z positivo
+  // Calcola la rotazione target per allineare il pin con l'asse Z positivo
   const targetEuler = new THREE.Euler(
     Math.asin(direction.y), // Rotazione sull'asse X
     Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y
     0 // Nessuna rotazione sull'asse Z
   );
 
+  // Calcola il quaternione target per la rotazione
   const targetQuaternion = new THREE.Quaternion().setFromEuler(targetEuler);
+
+  // Disabilita temporaneamente i controlli
+  controls.enabled = false;
 
   // Anima la rotazione della scena verso il pin selezionato
   gsap.to(scene.quaternion, {
@@ -286,11 +291,11 @@ function focusOnPin(pinIndex) {
     duration: 1.5,
     ease: 'power2.inOut',
     onUpdate: () => {
-      controls.update(); // Mantiene aggiornati i controlli durante l'animazione
+      controls.update(); // Aggiorna i controlli durante l'animazione
     },
     onComplete: () => {
-      // Reimposta l'auto-rotazione solo dopo che l'animazione è completata
-      controls.autoRotate = true;
+      // Riabilita i controlli dopo l'animazione
+      controls.enabled = true;
     }
   });
 

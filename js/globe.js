@@ -124,13 +124,22 @@ function addOrbitingPins() {
     // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
     pin.position.x = orbitRadius;
+
+    // Assegna l'indice e altre informazioni al pin
+    pin.userData = {
+      index: index, // Salva l'indice del pin
+      label: pos.label, // Etichetta del pin
+      orbitGroup: orbitGroup // Gruppo orbitale associato
+    };
+
     orbitGroup.add(pin);
+
+    // Aggiungi il pin e il gruppo orbitale agli array globali
     pins.push(pin);
     orbitGroups.push(orbitGroup);
   });
-
-  console.log(`Totale pin creati: ${pins.length}`);
 }
+
 
 function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 

@@ -80,7 +80,7 @@ function addGlobe() {
 function addCloudLayer() {
   const geometry = new THREE.SphereGeometry(0.61, 64, 64); // Raggio leggermente più grande del globo
   const textureLoader = new THREE.TextureLoader();
-  const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.webp');
+  const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
   const material = new THREE.MeshStandardMaterial({
     map: cloudsTexture,

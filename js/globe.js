@@ -1,6 +1,6 @@
 let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer;
 const pins = [];
-const orbitGroups = []; // Gruppi per i pin in orbita
+const orbitGroups = [];
 let selectedPin = null;
 
 function init() {
@@ -19,14 +19,14 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild(renderer.domElement);
 
-  // Inizializza il label renderer per i testi descrittivi
+  // Inizializza il label renderer
   labelRenderer = new THREE.CSS2DRenderer();
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0';
   container.appendChild(labelRenderer.domElement);
 
-  // Aggiungi luci alla scena
+  // Aggiungi luci
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
   scene.add(ambientLight);
 
@@ -34,19 +34,17 @@ function init() {
   directionalLight.position.set(5, 3, 5);
   scene.add(directionalLight);
 
-  // Aggiungi il globo
+  // Aggiungi globo e nuvole
   addGlobe();
-
-  // Aggiungi il livello delle nuvole sopra il globo
   addCloudLayer();
 
-  // Aggiungi i pin in orbita attorno al globo (senza le linee tratteggiate)
+  // Aggiungi pin orbitanti
   addOrbitingPins();
 
-  // Aggiungi Event Listener ai link di testo
+  // Setup collegamenti di testo
   setupTextLinks();
 
-  // Imposta i controlli per la telecamera
+  // Imposta i controlli
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableZoom = false;
   controls.minDistance = 2.5;
@@ -57,10 +55,14 @@ function init() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
-  // Event listener per il ridimensionamento
+  // Gestione del resize
   window.addEventListener('resize', onWindowResize);
   onWindowResize();
+
+  // Particelle
   addParticles();
+
+  // Animazione
   animate();
 }
 
@@ -68,34 +70,33 @@ function addGlobe() {
   const geometry = new THREE.SphereGeometry(0.6, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  
+
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,
-    opacity: 1,
     transparent: false,
     depthWrite: true,
     depthTest: true
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.position.set(0, 0, 0); // Assicura che il globo sia centrato
+  globe.position.set(0, 0, 0); // Centra il globo
   scene.add(globe);
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.605, 64, 64); // Raggio leggermente più grande del globo
+  const geometry = new THREE.SphereGeometry(0.605, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
   const material = new THREE.MeshBasicMaterial({
     map: cloudsTexture,
     transparent: true,
-    blending: THREE.AdditiveBlending, // Metodo di fusione tipo "screen"
-    opacity: 0.3 // Aggiunge trasparenza per un effetto più naturale
+    opacity: 0.3,
+    blending: THREE.AdditiveBlending
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
-  cloudLayer.position.set(0, 0, 0); // Assicura che le nuvole siano centrate
+  cloudLayer.position.set(0, 0, 0); // Centra le nuvole
   scene.add(cloudLayer);
 }
 
@@ -111,7 +112,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.63; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.63;
 
   pinPositions.forEach((pos, index) => {
     const orbitGroup = new THREE.Group();
@@ -119,18 +120,12 @@ function addOrbitingPins() {
     if (pos.axis === 'z') {
       orbitGroup.rotation.y = pos.inclination;
     }
-
-    orbitGroup.rotation.y += pos.startRotation; // Inizializzazione unica
+    orbitGroup.rotation.y += pos.startRotation;
     scene.add(orbitGroup);
 
     const pin = createPin(pos.label);
     pin.position.x = orbitRadius;
-
-    pin.userData = {
-      index: index,
-      label: pos.label,
-      orbitGroup: orbitGroup
-    };
+    pin.userData = { index, label: pos.label, orbitGroup };
 
     orbitGroup.add(pin);
     pins.push(pin);
@@ -139,7 +134,7 @@ function addOrbitingPins() {
 }
 
 function createPin(labelText) {
-  const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
+  const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16);
   const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
@@ -210,7 +205,6 @@ function focusOnPin(pinIndex) {
   pin.getWorldPosition(pinWorldPosition);
 
   const direction = pinWorldPosition.clone().normalize();
-
   const isBehind = pinWorldPosition.z < 0;
 
   const targetQuaternion = new THREE.Quaternion().setFromEuler(
@@ -235,6 +229,45 @@ function focusOnPin(pinIndex) {
     duration: 1.5,
     ease: 'power2.inOut'
   });
+}
+
+function addParticles() {
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 5000;
+  const positions = new Float32Array(particlesCount * 3);
+
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    const distance = Math.random() * 10 + 2;
+    const angle1 = Math.random() * Math.PI * 2;
+    const angle2 = Math.acos((Math.random() * 2) - 1);
+
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
+  }
+
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
+}
+
+function resizeGlobe() {
+  const maxGlobeScale = 1;
+  const minGlobeScale = 0.3;
+  const mobileScale = 0.6;
+  const screenWidth = window.innerWidth;
+  let scaleFactor = maxGlobeScale;
+
+  if (screenWidth < 850) {
+    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
+    scaleFactor = Math.max(minGlobeScale, scaleFactor);
+  }
+  if (screenWidth < 479) {
+    scaleFactor = mobileScale;
+  }
+
+  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
 }
 
 window.focusOnPin = focusOnPin;

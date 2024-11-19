@@ -259,49 +259,30 @@ function focusOnPin(pinIndex) {
   pin.userData.label.visible = true; // Mostra l'etichetta del nuovo pin
   selectedPin = pin; // Aggiorna il riferimento al pin selezionato
 
-  // Calcola la direzione del pin selezionato
+  // Calcola la posizione globale del pin selezionato
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition); // Ottieni la posizione globale del pin
 
   // Calcola la direzione normalizzata verso il pin
   const direction = pinWorldPosition.clone().normalize();
 
-  // Calcola la rotazione obiettivo per centrare il pin
+  // Calcola la rotazione obiettivo per la scena
   const targetRotation = new THREE.Euler(
     Math.asin(direction.y), // Rotazione sull'asse X
     Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
     0 // Nessuna rotazione sull'asse Z
   );
 
-  // Anima la rotazione del globo per centrare il pin
-  gsap.to(globe.rotation, {
+  // Anima la rotazione dell'intera scena per centrare il pin
+  gsap.to(scene.rotation, {
     x: targetRotation.x,
     y: targetRotation.y,
     z: targetRotation.z,
     duration: 1.5,
     ease: 'power2.inOut'
-  });
-
-  // Sincronizza il livello delle nuvole
-  gsap.to(cloudLayer.rotation, {
-    x: targetRotation.x,
-    y: targetRotation.y,
-    z: targetRotation.z,
-    duration: 1.5,
-    ease: 'power2.inOut'
-  });
-
-  // Sincronizza i gruppi orbitali dei pin
-  orbitGroups.forEach((group) => {
-    gsap.to(group.rotation, {
-      x: targetRotation.x,
-      y: targetRotation.y,
-      z: targetRotation.z,
-      duration: 1.5,
-      ease: 'power2.inOut'
-    });
   });
 }
+
 
 window.focusOnPin = focusOnPin;
 init();

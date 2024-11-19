@@ -172,7 +172,7 @@ function animate() {
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {
-    const rotationSpeed = 0.0005 + index * 0.00005;
+    const rotationSpeed = 0.0002 + index * 0.00002;
 
     // Ruota il gruppo orbitale (che contiene il pin)
     group.rotation.y += rotationSpeed;

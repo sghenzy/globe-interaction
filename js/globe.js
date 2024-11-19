@@ -42,6 +42,9 @@ function init() {
   // Aggiungi i pin in orbita attorno al globo (senza le linee tratteggiate)
   addOrbitingPins();
 
+  // Aggiungi Event Listener ai link di testo
+  setupTextLinks();
+
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableZoom = false;
@@ -92,7 +95,6 @@ function addCloudLayer() {
   cloudLayer = new THREE.Mesh(geometry, material);
   scene.add(cloudLayer);
 }
-
 
 function addOrbitingPins() {
   const pinPositions = [
@@ -146,6 +148,17 @@ function createPin(labelText) {
   pin.add(label);
 
   return pin;
+}
+
+function setupTextLinks() {
+  const links = document.querySelectorAll('.focus-link'); // Seleziona tutti i link con la classe "focus-link"
+  links.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault(); // Evita il comportamento predefinito del link
+      const pinIndex = parseInt(link.dataset.pinIndex, 10); // Ottieni l'indice dal data attributo
+      focusOnPin(pinIndex); // Chiama la funzione focusOnPin con l'indice del pin
+    });
+  });
 }
 
 function onWindowResize() {

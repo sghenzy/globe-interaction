@@ -86,7 +86,7 @@ function addCloudLayer() {
     map: cloudsTexture,
     transparent: true,
     blending: THREE.AdditiveBlending, // Metodo di fusione tipo "screen"
-    opacity: 0.2 // Aggiunge trasparenza per un effetto più naturale
+    opacity: 0.3 // Aggiunge trasparenza per un effetto più naturale
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);

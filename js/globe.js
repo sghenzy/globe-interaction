@@ -259,45 +259,57 @@ function focusOnPin(pinIndex) {
   pin.userData.label.visible = true; // Mostra l'etichetta
   selectedPin = pin;
 
-  // Calcola la posizione globale del pin selezionato
+  // Calcola la posizione globale del pin
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition);
 
-  // Calcola la direzione verso il pin rispetto al centro del globo
+  // Forza il globo a essere centrato a (0, 0, 0) nel sistema globale
+  globe.position.set(0, 0, 0);
+  scene.position.set(0, 0, 0);
+  camera.lookAt(0, 0, 0); // Centra la camera verso il centro del globo
+
+  // Calcola la direzione verso il pin rispetto al centro
   const direction = pinWorldPosition.clone().normalize();
 
-  // Calcola gli angoli necessari per portare il pin sull'asse Z positivo
-  const targetRotation = new THREE.Euler(
-    Math.asin(direction.y), // Rotazione sull'asse X
-    Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
-    0 // Nessuna rotazione sull'asse Z
+  // Verifica se il pin è "dietro" il globo
+  const isBehind = pinWorldPosition.z < 0;
+
+  // Calcola il quaternione target per allineare il pin all'asse Z positivo
+  const currentQuaternion = new THREE.Quaternion().copy(scene.quaternion);
+  const targetQuaternion = new THREE.Quaternion().setFromEuler(
+    new THREE.Euler(
+      Math.asin(direction.y), // Rotazione sull'asse X
+      Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y (aggiungi 180° se dietro)
+      0 // Nessuna rotazione sull'asse Z
+    )
   );
 
-  // Se il pin è dietro il globo, ruota la scena di 180° sull'asse Y
-  if (pinWorldPosition.z < 0) {
-    targetRotation.y += Math.PI;
+  // Anima la rotazione della scena usando il percorso più breve
+  const slerpDuration = 1.5; // Durata dell'animazione in secondi
+  let t = 0;
+
+  function animateRotation() {
+    t += 1 / (60 * slerpDuration); // Incremento in base ai frame per secondo
+    if (t > 1) t = 1;
+
+    THREE.Quaternion.slerp(currentQuaternion, targetQuaternion, scene.quaternion, t);
+
+    // Aggiorna la scena
+    controls.update();
+    if (t < 1) {
+      requestAnimationFrame(animateRotation);
+    }
   }
 
-  // Anima la rotazione della scena per centrare il pin
-  gsap.to(scene.rotation, {
-    x: targetRotation.x,
-    y: targetRotation.y,
-    z: targetRotation.z,
-    duration: 1.5,
-    ease: 'power2.inOut',
-    onUpdate: () => {
-      controls.update(); // Aggiorna i controlli durante l'animazione
-    }
-  });
+  animateRotation();
 
-  // Anima lo zoom della camera per mettere in evidenza il pin
+  // Opzionale: Zoom della camera per enfatizzare il pin selezionato
   gsap.to(camera.position, {
-    z: 4.5, // Avvicina la camera leggermente al globo
-    duration: 1.5,
+    z: 4.5, // Avvicina leggermente la camera per mettere in risalto il pin
+    duration: slerpDuration,
     ease: 'power2.inOut'
   });
 }
-
 
 window.focusOnPin = focusOnPin;
 init();

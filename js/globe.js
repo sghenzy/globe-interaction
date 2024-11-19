@@ -121,9 +121,6 @@ function addOrbitingPins() {
     orbitGroup.rotation.y += pos.startRotation; // Inizializzazione unica
     scene.add(orbitGroup);
 
-    // Assegna un indice e un'etichetta personalizzati al pin
-    pin.userData.index = index; // Salva l'indice corrente
-
     // Crea il pin e posizionalo nel gruppo orbitale
     const pin = createPin(pos.label);
     pin.position.x = orbitRadius;

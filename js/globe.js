@@ -82,17 +82,17 @@ function addCloudLayer() {
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
-  const material = new THREE.MeshStandardMaterial({
+  const material = new THREE.MeshBasicMaterial({
     map: cloudsTexture,
     transparent: true,
-    opacity: 0.8, // Aggiunge trasparenza per un effetto realistico
-    depthWrite: false, // Evita problemi con la profondità
-    depthTest: true
+    blending: THREE.AdditiveBlending, // Metodo di fusione tipo "screen"
+    opacity: 0.8 // Aggiunge trasparenza per un effetto più naturale
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
   scene.add(cloudLayer);
 }
+
 
 function addOrbitingPins() {
   const pinPositions = [

@@ -86,7 +86,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.6; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.65; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin

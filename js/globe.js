@@ -39,7 +39,7 @@ function init() {
   // Aggiungi il livello delle nuvole sopra il globo
   addCloudLayer();
 
-  // Aggiungi i pin in orbita attorno al globo
+  // Aggiungi i pin in orbita attorno al globo (senza le linee tratteggiate)
   addOrbitingPins();
 
   // Aggiungi Event Listener ai link di testo
@@ -122,21 +122,20 @@ function addOrbitingPins() {
     scene.add(orbitGroup);
 
     // Crea il pin e posizionalo nel gruppo orbitale
-    const pin = createPin(pos.label, index); // Assegna l'indice al pin
+    const pin = createPin(pos.label);
     pin.position.x = orbitRadius;
     orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
   });
+
+  console.log(`Totale pin creati: ${pins.length}`);
 }
 
-function createPin(labelText, index) {
+function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16); 
   const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-
-  // Assegna dati personalizzati al pin
-  pin.userData = { label: labelText, index: index };
 
   const labelDiv = document.createElement('div');
   labelDiv.className = 'pin-label';
@@ -160,6 +159,80 @@ function setupTextLinks() {
       focusOnPin(pinIndex); // Chiama la funzione focusOnPin con l'indice del pin
     });
   });
+}
+
+function onWindowResize() {
+  let containerWidth = window.innerWidth;
+  const containerHeight = window.innerHeight;
+
+  camera.aspect = containerWidth / containerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(containerWidth, containerHeight);
+  labelRenderer.setSize(containerWidth, containerHeight);
+
+  resizeGlobe();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Ruota il globo sull'asse Y
+  globe.rotation.y += 0.0001;
+
+  // Ruota il livello delle nuvole nello stesso verso, ma più velocemente
+  cloudLayer.rotation.y += 0.0004; // Velocità leggermente superiore a quella del globo
+
+  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
+  orbitGroups.forEach((group, index) => {
+    const rotationSpeed = 0.0002 + index * 0.00002;
+
+    // Ruota il gruppo orbitale (che contiene il pin)
+    group.rotation.y += rotationSpeed;
+  });
+
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+function addParticles() {
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 5000;
+  const positions = new Float32Array(particlesCount * 3);
+
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    const distance = Math.random() * 10 + 2;
+    const angle1 = Math.random() * Math.PI * 2;
+    const angle2 = Math.acos((Math.random() * 2) - 1);
+
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
+  }
+
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
+}
+
+function resizeGlobe() {
+  const maxGlobeScale = 1;
+  const minGlobeScale = 0.3;
+  const mobileScale = 0.6;
+  const screenWidth = window.innerWidth;
+  let scaleFactor = maxGlobeScale;
+
+  if (screenWidth < 850) {
+    scaleFactor = minGlobeScale + (screenWidth - 560) * (maxGlobeScale - minGlobeScale) / (850 - 560);
+    scaleFactor = Math.max(minGlobeScale, scaleFactor);
+  }
+  if (screenWidth < 479) {
+    scaleFactor = mobileScale;
+  }
+
+  globe.scale.set(scaleFactor, scaleFactor, scaleFactor);
 }
 
 function focusOnPin(pinIndex) {
@@ -192,25 +265,5 @@ function focusOnPin(pinIndex) {
   });
 }
 
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Ruota il globo sull'asse Y
-  globe.rotation.y += 0.0001;
-
-  // Ruota il livello delle nuvole nello stesso verso, ma più velocemente
-  cloudLayer.rotation.y += 0.0004; // Velocità leggermente superiore a quella del globo
-
-  // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
-  orbitGroups.forEach((group, index) => {
-    const rotationSpeed = 0.0002 + index * 0.00002;
-    group.rotation.y += rotationSpeed;
-  });
-
-  controls.update();
-  renderer.render(scene, camera);
-  labelRenderer.render(scene, camera);
-}
-
-// Inizializzazione
+window.focusOnPin = focusOnPin;
 init();

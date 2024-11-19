@@ -266,14 +266,23 @@ function focusOnPin(pinIndex) {
   // Normalizza la posizione per calcolare la direzione
   const direction = pinWorldPosition.clone().normalize();
 
-  // Calcola gli angoli di rotazione per allineare il pin all'asse Z positivo
-  const targetRotation = new THREE.Euler(
+  // Verifica se il pin è dietro il globo
+  const cameraDirection = new THREE.Vector3(0, 0, 1); // Direzione della camera (asse Z positivo)
+  const isBehind = direction.dot(cameraDirection) < 0; // Controlla se il prodotto scalare è negativo
+
+  // Calcola la rotazione target
+  let targetRotation = new THREE.Euler(
     Math.asin(direction.y), // Rotazione sull'asse X
     Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
     0 // Nessuna rotazione sull'asse Z
   );
 
-  // Anima la rotazione dell'intera scena per centrare il pin
+  // Se il pin è dietro, aggiungi 180° sull'asse Y
+  if (isBehind) {
+    targetRotation.y += Math.PI;
+  }
+
+  // Anima la rotazione della scena
   gsap.to(scene.rotation, {
     x: targetRotation.x,
     y: targetRotation.y,
@@ -282,14 +291,13 @@ function focusOnPin(pinIndex) {
     ease: 'power2.inOut'
   });
 
-  // Opzionale: Zoom per enfatizzare il pin selezionato
+  // Anima lo zoom della camera per mettere in evidenza il pin
   gsap.to(camera.position, {
-    z: 4.5, // Avvicina leggermente la camera
+    z: 4.5, // Zoom verso il globo
     duration: 1.5,
     ease: 'power2.inOut'
   });
 }
-
 
 window.focusOnPin = focusOnPin;
 init();

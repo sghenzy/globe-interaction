@@ -248,31 +248,45 @@ function focusOnPin(pinIndex) {
   const pin = pins[pinIndex];
   if (!pin) return;
 
+  // Ripristina il pin precedentemente selezionato
   if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-    selectedPin.userData.label.visible = false;
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Colore originale
+    selectedPin.userData.label.visible = false; // Nasconde l'etichetta precedente
   }
 
-  pin.material.color.set('rgb(173, 216, 230)');
-  pin.userData.label.visible = true;
-  selectedPin = pin;
+  // Aggiorna il nuovo pin selezionato
+  pin.material.color.set('rgb(173, 216, 230)'); // Colore per il pin selezionato
+  pin.userData.label.visible = true; // Mostra l'etichetta del nuovo pin
+  selectedPin = pin; // Aggiorna il riferimento al pin selezionato
 
-  const direction = pin.position.clone().normalize();
-  const targetRotation = new THREE.Euler(
-    Math.asin(direction.y),
-    Math.atan2(-direction.x, direction.z),
-    0
-  );
+  // Ottieni il gruppo orbitale associato al pin
+  const orbitGroup = pin.userData.orbitGroup;
 
+  // Calcola la rotazione obiettivo del gruppo orbitale
+  const targetRotation = orbitGroup.rotation.y;
+
+  // Anima la rotazione del globo verso il gruppo orbitale
   gsap.to(globe.rotation, {
-    x: targetRotation.x,
-    y: targetRotation.y,
-    z: targetRotation.z,
+    y: targetRotation,
     duration: 1.5,
-    ease: 'power2.inOut',
-    onUpdate: () => controls.update()
+    ease: 'power2.inOut'
+  });
+
+  // Anima la rotazione del livello delle nuvole per sincronizzarlo
+  gsap.to(cloudLayer.rotation, {
+    y: targetRotation,
+    duration: 1.7, // Leggermente più lento per un effetto fluido
+    ease: 'power2.inOut'
+  });
+
+  // Anima la rotazione del gruppo orbitale per centrare il pin
+  gsap.to(orbitGroup.rotation, {
+    y: 0, // Porta il pin selezionato nella posizione centrale
+    duration: 1.5,
+    ease: 'power2.inOut'
   });
 }
+
 
 window.focusOnPin = focusOnPin;
 init();

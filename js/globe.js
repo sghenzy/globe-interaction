@@ -168,7 +168,7 @@ function animate() {
   globe.rotation.y += 0.0001;
 
   // Ruota il livello delle nuvole nello stesso verso, ma più velocemente
-  cloudLayer.rotation.y += 0.00015; // Velocità leggermente superiore a quella del globo
+  cloudLayer.rotation.y += 0.0002; // Velocità leggermente superiore a quella del globo
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {

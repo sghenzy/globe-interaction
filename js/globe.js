@@ -263,21 +263,17 @@ function focusOnPin(pinIndex) {
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition); // Ottieni la posizione globale del pin
 
-  // Calcola la direzione normalizzata verso il pin
+  // Normalizza la posizione per calcolare la direzione
   const direction = pinWorldPosition.clone().normalize();
 
-  // Calcola la rotazione obiettivo per portare il pin al centro
+  // Calcola gli angoli di rotazione per allineare il pin all'asse Z positivo
   const targetRotation = new THREE.Euler(
     Math.asin(direction.y), // Rotazione sull'asse X
     Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
     0 // Nessuna rotazione sull'asse Z
   );
 
-  // Aggiusta leggermente la rotazione per centrare il pin perfettamente nella faccia
-  const offsetAngle = 0.1; // Offset per allineare il pin al centro
-  targetRotation.x += offsetAngle;
-
-  // Anima la rotazione dell'intera scena
+  // Anima la rotazione dell'intera scena per centrare il pin
   gsap.to(scene.rotation, {
     x: targetRotation.x,
     y: targetRotation.y,
@@ -286,13 +282,14 @@ function focusOnPin(pinIndex) {
     ease: 'power2.inOut'
   });
 
-  // Aggiungi uno zoom leggero per enfatizzare il focus sul pin
+  // Opzionale: Zoom per enfatizzare il pin selezionato
   gsap.to(camera.position, {
     z: 4.5, // Avvicina leggermente la camera
     duration: 1.5,
     ease: 'power2.inOut'
   });
 }
+
 
 window.focusOnPin = focusOnPin;
 init();

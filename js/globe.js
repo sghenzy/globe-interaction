@@ -245,34 +245,39 @@ function resizeGlobe() {
 }
 
 function focusOnPin(pinIndex) {
-  const pin = pins[pinIndex];
-  if (!pin) return;
+  const pin = pins[pinIndex]; // Recupera il pin dall'array globale
+  if (!pin) return; // Se il pin non esiste, esce dalla funzione
 
+  // Resetta il pin precedentemente selezionato
   if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-    selectedPin.userData.label.visible = false;
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Ripristina il colore del pin precedente
+    selectedPin.userData.label.visible = false; // Nasconde l'etichetta precedente
   }
 
-  pin.material.color.set('rgb(173, 216, 230)');
-  pin.userData.label.visible = true;
-  selectedPin = pin;
+  // Aggiorna il pin selezionato
+  pin.material.color.set('rgb(173, 216, 230)'); // Cambia il colore del pin selezionato
+  pin.userData.label.visible = true; // Mostra l'etichetta del pin
+  selectedPin = pin; // Imposta il nuovo pin selezionato
 
-  const direction = pin.position.clone().normalize();
+  // Calcola la direzione verso il pin e aggiorna la rotazione del globo
+  const direction = pin.position.clone().normalize(); // Direzione normalizzata del pin
   const targetRotation = new THREE.Euler(
     Math.asin(direction.y),
     Math.atan2(-direction.x, direction.z),
     0
   );
 
+  // Anima la rotazione del globo verso il pin selezionato
   gsap.to(globe.rotation, {
     x: targetRotation.x,
     y: targetRotation.y,
     z: targetRotation.z,
     duration: 1.5,
     ease: 'power2.inOut',
-    onUpdate: () => controls.update()
+    onUpdate: () => controls.update() // Aggiorna i controlli durante l'animazione
   });
 }
+
 
 window.focusOnPin = focusOnPin;
 init();

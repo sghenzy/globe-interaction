@@ -1,4 +1,4 @@
-let scene, camera, renderer, globe, controls, particleSystem, labelRenderer;
+let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer;
 const pins = [];
 const orbitGroups = []; // Gruppi per i pin in orbita
 let selectedPin = null;
@@ -36,6 +36,9 @@ function init() {
   // Aggiungi il globo
   addGlobe();
 
+  // Aggiungi il livello delle nuvole sopra il globo
+  addCloudLayer();
+
   // Aggiungi i pin in orbita attorno al globo (senza le linee tratteggiate)
   addOrbitingPins();
 
@@ -66,12 +69,29 @@ function addGlobe() {
     map: earthTexture,
     opacity: 1,
     transparent: false,
-    depthWrite: true, // Assicura che il globo blocchi visivamente gli oggetti dietro
-    depthTest: true   // Mantieni il test di profondità per una corretta visualizzazione
+    depthWrite: true,
+    depthTest: true
   });
 
   globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
+}
+
+function addCloudLayer() {
+  const geometry = new THREE.SphereGeometry(0.61, 64, 64); // Raggio leggermente più grande del globo
+  const textureLoader = new THREE.TextureLoader();
+  const cloudsTexture = textureLoader.load('img/convertite/fair_clouds_8k.webp');
+
+  const material = new THREE.MeshStandardMaterial({
+    map: cloudsTexture,
+    transparent: true,
+    opacity: 0.8, // Aggiunge trasparenza per un effetto realistico
+    depthWrite: false, // Evita problemi con la profondità
+    depthTest: true
+  });
+
+  cloudLayer = new THREE.Mesh(geometry, material);
+  scene.add(cloudLayer);
 }
 
 function addOrbitingPins() {
@@ -144,8 +164,11 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
 
-  // Ruota solo il globo sull'asse Y
+  // Ruota il globo sull'asse Y
   globe.rotation.y += 0.001;
+
+  // Ruota il livello delle nuvole in senso opposto
+  cloudLayer.rotation.y -= 0.0005;
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {

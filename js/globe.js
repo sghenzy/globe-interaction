@@ -263,6 +263,11 @@ function focusOnPin(pinIndex) {
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition);
 
+  // Forza il globo a essere centrato a (0, 0, 0) nel sistema globale
+  globe.position.set(0, 0, 0);
+  scene.position.set(0, 0, 0);
+  camera.lookAt(0, 0, 0); // Centra la camera verso il centro del globo
+
   // Calcola la direzione verso il pin rispetto al centro
   const direction = pinWorldPosition.clone().normalize();
 
@@ -274,30 +279,36 @@ function focusOnPin(pinIndex) {
   const targetQuaternion = new THREE.Quaternion().setFromEuler(
     new THREE.Euler(
       Math.asin(direction.y), // Rotazione sull'asse X
-      Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y
-      0
+      Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y (aggiungi 180° se dietro)
+      0 // Nessuna rotazione sull'asse Z
     )
   );
 
-  // Ruota l'intera scena per portare il pin davanti alla camera
-  gsap.to(scene.quaternion, {
-    x: targetQuaternion.x,
-    y: targetQuaternion.y,
-    z: targetQuaternion.z,
-    w: targetQuaternion.w,
-    duration: 1.5,
-    ease: 'power2.inOut'
-  });
+  // Anima la rotazione della scena usando il percorso più breve
+  const slerpDuration = 1.5; // Durata dell'animazione in secondi
+  let t = 0;
 
-  // Zoom della camera per enfatizzare il pin selezionato
+  function animateRotation() {
+    t += 1 / (60 * slerpDuration); // Incremento in base ai frame per secondo
+    if (t > 1) t = 1;
+
+    THREE.Quaternion.slerp(currentQuaternion, targetQuaternion, scene.quaternion, t);
+
+    // Aggiorna la scena
+    controls.update();
+    if (t < 1) {
+      requestAnimationFrame(animateRotation);
+    }
+  }
+
+  animateRotation();
+
+  // Opzionale: Zoom della camera per enfatizzare il pin selezionato
   gsap.to(camera.position, {
     z: 4.5, // Avvicina leggermente la camera per mettere in risalto il pin
-    duration: 1.5,
+    duration: slerpDuration,
     ease: 'power2.inOut'
   });
-
-  // Assicurati che la camera guardi sempre verso il centro del globo
-  camera.lookAt(0, 0, 0);
 }
 
 window.focusOnPin = focusOnPin;

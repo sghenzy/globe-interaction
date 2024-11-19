@@ -78,7 +78,7 @@ function addGlobe() {
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.61, 64, 64); // Raggio leggermente più grande del globo
+  const geometry = new THREE.SphereGeometry(0.605, 64, 64); // Raggio leggermente più grande del globo
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
@@ -86,7 +86,7 @@ function addCloudLayer() {
     map: cloudsTexture,
     transparent: true,
     blending: THREE.AdditiveBlending, // Metodo di fusione tipo "screen"
-    opacity: 0.8 // Aggiunge trasparenza per un effetto più naturale
+    opacity: 0.5 // Aggiunge trasparenza per un effetto più naturale
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
@@ -106,7 +106,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.65; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.63; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin
@@ -167,8 +167,8 @@ function animate() {
   // Ruota il globo sull'asse Y
   globe.rotation.y += 0.001;
 
-  // Ruota il livello delle nuvole in senso opposto
-  cloudLayer.rotation.y -= 0.0005;
+  // Ruota il livello delle nuvole nello stesso verso, ma più velocemente
+  cloudLayer.rotation.y += 0.0015; // Velocità leggermente superiore a quella del globo
 
   // Ruota ciascun gruppo orbitale per creare l'effetto di orbita più lento
   orbitGroups.forEach((group, index) => {

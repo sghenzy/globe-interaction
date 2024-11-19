@@ -263,46 +263,45 @@ function focusOnPin(pinIndex) {
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition);
 
-  // Normalizza la posizione per ottenere la direzione verso il centro del globo
+  // Forza il globo e la scena a essere centrati
+  globe.position.set(0, 0, 0);
+  scene.position.set(0, 0, 0);
+  camera.lookAt(0, 0, 0);
+
+  // Calcola la direzione del pin rispetto al centro
   const direction = pinWorldPosition.clone().normalize();
 
-  // Determina se il pin è dietro il globo
+  // Verifica se il pin è "dietro" il globo
   const isBehind = pinWorldPosition.z < 0;
 
-  // Calcola la rotazione target per allineare il pin con l'asse Z positivo
-  const targetEuler = new THREE.Euler(
-    Math.asin(direction.y), // Rotazione sull'asse X
-    Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y
-    0 // Nessuna rotazione sull'asse Z
+  // Calcola il quaternione target per allineare il pin all'asse Z positivo
+  const currentQuaternion = new THREE.Quaternion().copy(scene.quaternion);
+  const targetQuaternion = new THREE.Quaternion().setFromEuler(
+    new THREE.Euler(
+      Math.asin(direction.y), // Rotazione sull'asse X
+      Math.atan2(-direction.x, direction.z) + (isBehind ? Math.PI : 0), // Rotazione sull'asse Y (aggiungi 180° se dietro)
+      0 // Nessuna rotazione sull'asse Z
+    )
   );
 
-  // Calcola il quaternione target per la rotazione
-  const targetQuaternion = new THREE.Quaternion().setFromEuler(targetEuler);
+  // Usa GSAP per interpolare la rotazione con easing morbido
+  const easingDuration = 1.5; // Durata in secondi
+  let t = { progress: 0 }; // Variabile per gestire il progresso dell'easing
 
-  // Disabilita temporaneamente i controlli
-  controls.enabled = false;
-
-  // Anima la rotazione della scena verso il pin selezionato
-  gsap.to(scene.quaternion, {
-    x: targetQuaternion.x,
-    y: targetQuaternion.y,
-    z: targetQuaternion.z,
-    w: targetQuaternion.w,
-    duration: 1.5,
+  gsap.to(t, {
+    progress: 1,
+    duration: easingDuration,
     ease: 'power2.inOut',
     onUpdate: () => {
+      THREE.Quaternion.slerp(currentQuaternion, targetQuaternion, scene.quaternion, t.progress);
       controls.update(); // Aggiorna i controlli durante l'animazione
-    },
-    onComplete: () => {
-      // Riabilita i controlli dopo l'animazione
-      controls.enabled = true;
     }
   });
 
   // Zoom della camera per enfatizzare il pin selezionato
   gsap.to(camera.position, {
     z: 4.5, // Avvicina la camera per mettere in risalto il pin
-    duration: 1.5,
+    duration: easingDuration,
     ease: 'power2.inOut'
   });
 }

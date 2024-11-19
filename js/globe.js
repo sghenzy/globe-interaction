@@ -250,35 +250,35 @@ function focusOnPin(pinIndex) {
 
   // Ripristina lo stato del pin precedentemente selezionato
   if (selectedPin) {
-    selectedPin.material.color.set('rgb(255, 255, 0)'); // Colore giallo per i pin non selezionati
-    selectedPin.userData.label.visible = false; // Nasconde l'etichetta
+    selectedPin.material.color.set('rgb(255, 255, 0)'); // Giallo per i pin non selezionati
+    selectedPin.userData.label.visible = false; // Nasconde l'etichetta precedente
   }
 
   // Aggiorna il nuovo pin selezionato
-  pin.material.color.set('rgb(0, 102, 255)'); // Colore blu per il pin selezionato
+  pin.material.color.set('rgb(0, 102, 255)'); // Blu per il pin selezionato
   pin.userData.label.visible = true; // Mostra l'etichetta
   selectedPin = pin;
 
-  // Calcola la posizione globale del pin
+  // Calcola la posizione globale del pin selezionato
   const pinWorldPosition = new THREE.Vector3();
   pin.getWorldPosition(pinWorldPosition);
 
-  // Normalizza la posizione per calcolare la direzione
+  // Calcola la direzione verso il pin rispetto al centro del globo
   const direction = pinWorldPosition.clone().normalize();
 
-  // Calcola l'angolo necessario per allineare il pin all'asse Z positivo
-  let targetRotation = new THREE.Euler(
+  // Calcola gli angoli necessari per portare il pin sull'asse Z positivo
+  const targetRotation = new THREE.Euler(
     Math.asin(direction.y), // Rotazione sull'asse X
     Math.atan2(-direction.x, direction.z), // Rotazione sull'asse Y
     0 // Nessuna rotazione sull'asse Z
   );
 
-  // Determina se il pin è "dietro" il globo rispetto alla camera
+  // Se il pin è dietro il globo, ruota la scena di 180° sull'asse Y
   if (pinWorldPosition.z < 0) {
-    targetRotation.y += Math.PI; // Ruota di 180° sull'asse Y per portare il pin davanti
+    targetRotation.y += Math.PI;
   }
 
-  // Anima la rotazione della scena per portare il pin al centro
+  // Anima la rotazione della scena per centrare il pin
   gsap.to(scene.rotation, {
     x: targetRotation.x,
     y: targetRotation.y,
@@ -290,13 +290,14 @@ function focusOnPin(pinIndex) {
     }
   });
 
-  // Zoom della camera per enfatizzare il pin selezionato
+  // Anima lo zoom della camera per mettere in evidenza il pin
   gsap.to(camera.position, {
-    z: 4.5, // Avvicina leggermente la camera per mettere in risalto il pin
+    z: 4.5, // Avvicina la camera leggermente al globo
     duration: 1.5,
     ease: 'power2.inOut'
   });
 }
+
 
 window.focusOnPin = focusOnPin;
 init();

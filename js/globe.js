@@ -215,22 +215,19 @@ function addInfoBox(pinPosition, pinLabel) {
   let boxX = (screenPosition.x * halfWidth) + halfWidth;
   let boxY = -(screenPosition.y * halfHeight) + halfHeight;
 
-  // Distanza minima del box dal centro del globo
-  const minDistanceFromGlobe = 100; // Distanza minima in pixel
+  // Distanza minima dal pin
+  const globeRadius = 0.45; // Raggio del globo
+  const minDistanceFromPin = (globeRadius / 2) * (window.innerHeight / 2); // Calcolo in pixel
 
-  // Riposizionamento dinamico per mantenere una distanza minima
-  const globeCenter = new THREE.Vector3(0, 0, 0).project(camera);
-  const globeScreenX = (globeCenter.x * halfWidth) + halfWidth;
-  const globeScreenY = -(globeCenter.y * halfHeight) + halfHeight;
-
-  const dx = boxX - globeScreenX;
-  const dy = boxY - globeScreenY;
+  // Sposta il box lungo la direzione pin -> box
+  const dx = boxX - halfWidth;
+  const dy = boxY - halfHeight;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance < minDistanceFromGlobe) {
-    const scaleFactor = minDistanceFromGlobe / distance;
-    boxX = globeScreenX + dx * scaleFactor;
-    boxY = globeScreenY + dy * scaleFactor;
+  if (distance < minDistanceFromPin) {
+    const scaleFactor = minDistanceFromPin / distance;
+    boxX = halfWidth + dx * scaleFactor;
+    boxY = halfHeight + dy * scaleFactor;
   }
 
   // Applica la posizione al box

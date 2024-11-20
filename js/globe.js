@@ -218,6 +218,7 @@ function addInfoBox(pinPosition, pinLabel) {
   box.id = 'info-box';
   box.style.position = 'absolute';
   box.style.backgroundColor = '#d6d6d6';
+  box.style.backdropFilter = 'blur(10px)'; 
   box.style.padding = '10px';
   box.style.borderRadius = '5px';
   box.style.color = 'black';

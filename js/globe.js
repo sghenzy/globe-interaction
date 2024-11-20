@@ -214,7 +214,7 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Coordinate del pin sullo schermo
   const pinX = (screenPosition.x * halfWidth) + halfWidth;
-  const pinY = -(screenPosition.y * halfHeight) + halfHeight + 30;
+  const pinY = -(screenPosition.y * halfHeight) + halfHeight;
 
   // Calcola la direzione dal pin per posizionare il box
   const directionX = pinX - halfWidth;
@@ -227,7 +227,7 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Calcola la posizione del box applicando la distanza fissa
   const boxX = pinX + normalizedX * fixedDistance;
-  const boxY = pinY + normalizedY * fixedDistance;
+  const boxY = pinY + normalizedY * fixedDistance - 20;
 
   // Applica la posizione del box
   box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente

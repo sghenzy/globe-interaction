@@ -1,27 +1,35 @@
-let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer, line, infoBox;
+let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer;
 const pins = [];
 const orbitGroups = [];
 let selectedPin = null;
+
+// Raycaster per interazione
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
 
 function init() {
   const container = document.getElementById('globe-container');
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x161616);
 
+  // Inizializza la camera
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
 
+  // Inizializza il renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth - 300, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild(renderer.domElement);
 
+  // Inizializza il label renderer
   labelRenderer = new THREE.CSS2DRenderer();
   labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0';
   container.appendChild(labelRenderer.domElement);
 
+  // Aggiungi luci
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
   scene.add(ambientLight);
 
@@ -29,11 +37,14 @@ function init() {
   directionalLight.position.set(5, 3, 5);
   scene.add(directionalLight);
 
+  // Aggiungi globo e nuvole
   addGlobe();
   addCloudLayer();
-  addOrbitingPins();
-  createInfoBox();
 
+  // Aggiungi pin
+  addOrbitingPins();
+
+  // Controlli della telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableZoom = false;
   controls.minDistance = 2.5;
@@ -44,17 +55,19 @@ function init() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
+  // Event listener
   window.addEventListener('resize', onWindowResize);
+  window.addEventListener('click', onMouseClick);
   onWindowResize();
   addParticles();
   animate();
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.64, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.45, 64, 64); // Assicurati che il globo sia una sfera perfetta
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
-  
+
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,
     opacity: 1,
@@ -68,7 +81,7 @@ function addGlobe() {
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.641, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.48, 64, 64); // Nuvole leggermente sopra il globo
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
@@ -95,7 +108,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.7;
+  const orbitRadius = 0.5;
 
   pinPositions.forEach((pos, index) => {
     const orbitGroup = new THREE.Group();
@@ -107,23 +120,24 @@ function addOrbitingPins() {
     orbitGroup.rotation.y += pos.startRotation;
     scene.add(orbitGroup);
 
-    const pin = createPin(pos.label, index);
+    const pin = createPin(pos.label);
     pin.position.x = orbitRadius;
-    orbitGroup.add(pin);
 
+    pin.userData = {
+      index: index,
+      label: pos.label
+    };
+
+    orbitGroup.add(pin);
     pins.push(pin);
     orbitGroups.push(orbitGroup);
   });
 }
 
-function createPin(labelText, index) {
+function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16);
   const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-
-  pin.userData = { label: labelText, index: index };
-
-  pin.callback = () => handlePinClick(pin);
 
   const labelDiv = document.createElement('div');
   labelDiv.className = 'pin-label';
@@ -138,73 +152,38 @@ function createPin(labelText, index) {
   return pin;
 }
 
-function createInfoBox() {
-  infoBox = document.createElement('div');
-  infoBox.id = 'info-box';
-  infoBox.style.position = 'absolute';
-  infoBox.style.background = 'rgba(255, 192, 203, 0.9)';
-  infoBox.style.padding = '10px';
-  infoBox.style.borderRadius = '5px';
-  infoBox.style.display = 'none';
-  infoBox.innerHTML = `<h3 id="info-title"></h3><p id="info-description"></p>`;
-  document.body.appendChild(infoBox);
-}
+function onMouseClick(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-function handlePinClick(pin) {
-  // Ripristina il colore del pin precedentemente selezionato
-  if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(pins);
+
+  if (intersects.length > 0) {
+    const clickedPin = intersects[0].object;
+    focusOnPin(clickedPin.userData.index);
   }
-
-  // Aggiorna il pin selezionato
-  selectedPin = pin;
-  selectedPin.material.color.set('rgb(0, 102, 255)');
-
-  // Mostra il box informativo
-  const title = document.getElementById('info-title');
-  const description = document.getElementById('info-description');
-  title.innerText = selectedPin.userData.label;
-  description.innerText = `Descrizione di ${selectedPin.userData.label}`;
-
-  infoBox.style.display = 'block';
-  infoBox.style.left = '50px';
-  infoBox.style.top = '50px';
-
-  freezeScene();
-  drawLineToBox(pin);
 }
 
-function drawLineToBox(pin) {
-  if (line) scene.remove(line);
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 
-  const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-  const points = [];
-  points.push(pin.position.clone());
-  points.push(new THREE.Vector3(0, 0, 0));
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  line = new THREE.Line(geometry, material);
-  scene.add(line);
-}
-
-function freezeScene() {
-  controls.autoRotate = false;
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
-  // Ruota il globo e le nuvole solo se la scena non è freezata
-  if (!selectedPin) {
-    globe.rotation.y += 0.0001;
-    cloudLayer.rotation.y += 0.0004;
+  globe.rotation.y += 0.0001;
+  cloudLayer.rotation.y += 0.0004;
 
-    orbitGroups.forEach((group) => {
-      group.rotation.y += 0.0002;
-    });
-  } else {
-    cloudLayer.rotation.y += 0.0004;
-  }
+  orbitGroups.forEach((group, index) => {
+    const rotationSpeed = 0.0002 + index * 0.00002;
+    group.rotation.y += rotationSpeed;
+  });
 
   controls.update();
   renderer.render(scene, camera);
@@ -230,14 +209,6 @@ function addParticles() {
   const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(window.innerWidth - 300, window.innerHeight);
-  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
 }
 
 init();

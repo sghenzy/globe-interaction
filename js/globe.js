@@ -207,28 +207,28 @@ function addInfoBox(pinPosition, pinLabel) {
 
   document.body.appendChild(box);
 
-  // Calcola la posizione del box basata sulla distanza minima
-  const globeRadius = 0.45; // Raggio del globo
-  const minDistanceFromPin = globeRadius * 0.5; // Distanza minima dal pin
+  // Imposta una distanza fissa per il box dal pin
+  const fixedDistance = 100; // Distanza fissa in pixel
   const screenPosition = pinPosition.clone().project(camera);
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;
 
-  // Posizione iniziale del box
-  let boxX = (screenPosition.x * halfWidth) + halfWidth;
-  let boxY = -(screenPosition.y * halfHeight) + halfHeight;
+  // Coordinate del pin sullo schermo
+  const pinX = (screenPosition.x * halfWidth) + halfWidth;
+  const pinY = -(screenPosition.y * halfHeight) + halfHeight;
 
-  // Calcola la direzione per posizionare il box
-  const dx = boxX - halfWidth;
-  const dy = boxY - halfHeight;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  // Calcola la direzione dal pin per posizionare il box
+  const directionX = pinX - halfWidth;
+  const directionY = pinY - halfHeight;
+  const length = Math.sqrt(directionX * directionX + directionY * directionY);
 
-  // Se il box è troppo vicino, lo sposta di una distanza minima
-  if (distance < minDistanceFromPin) {
-    const scaleFactor = minDistanceFromPin / distance;
-    boxX = halfWidth + dx * scaleFactor;
-    boxY = halfHeight + dy * scaleFactor;
-  }
+  // Normalizza la direzione per applicare la distanza fissa
+  const normalizedX = directionX / length;
+  const normalizedY = directionY / length;
+
+  // Calcola la posizione del box applicando la distanza fissa
+  const boxX = pinX + normalizedX * fixedDistance;
+  const boxY = pinY + normalizedY * fixedDistance;
 
   // Applica la posizione del box
   box.style.left = `${boxX}px`;
@@ -239,10 +239,11 @@ function addInfoBox(pinPosition, pinLabel) {
 }
 
 function drawLineToBox(pinPosition, boxX, boxY) {
-  // Converti le coordinate del box in 3D usando unmapping dalla camera
+  // Converti le coordinate del box in coordinate 3D
   const boxWorldPosition = new THREE.Vector3(
     (boxX / window.innerWidth) * 2 - 1,
-    -(boxY / window.innerHeight) * 2 + 1,    0
+    -(boxY / window.innerHeight) * 2 + 1,
+    0
   ).unproject(camera);
 
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
@@ -261,7 +262,6 @@ function drawLineToBox(pinPosition, boxX, boxY) {
   scene.userData.lastLine = line;
   scene.add(line);
 }
-
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

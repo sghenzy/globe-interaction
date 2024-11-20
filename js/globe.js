@@ -2,7 +2,6 @@ let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelR
 const pins = [];
 const orbitGroups = [];
 let selectedPin = null;
-let isFrozen = false;
 
 function init() {
   const container = document.getElementById('globe-container');
@@ -52,7 +51,7 @@ function init() {
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.6, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.45, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   
@@ -69,7 +68,7 @@ function addGlobe() {
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.605, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.48, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
@@ -96,11 +95,14 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.63;
+  const orbitRadius = 0.5;
 
   pinPositions.forEach((pos, index) => {
     const orbitGroup = new THREE.Group();
     orbitGroup.rotation.x = pos.inclination;
+    if (pos.axis === 'z') {
+      orbitGroup.rotation.y = pos.inclination;
+    }
 
     orbitGroup.rotation.y += pos.startRotation;
     scene.add(orbitGroup);
@@ -108,11 +110,10 @@ function addOrbitingPins() {
     const pin = createPin(pos.label, index);
     pin.position.x = orbitRadius;
     orbitGroup.add(pin);
+
     pins.push(pin);
     orbitGroups.push(orbitGroup);
   });
-
-  console.log(`Totale pin creati: ${pins.length}`);
 }
 
 function createPin(labelText, index) {
@@ -134,8 +135,6 @@ function createPin(labelText, index) {
   label.visible = false;
   pin.add(label);
 
-  pin.addEventListener('click', () => handlePinClick(pin));
-
   return pin;
 }
 
@@ -152,20 +151,26 @@ function createInfoBox() {
 }
 
 function handlePinClick(pin) {
-  if (!isFrozen) {
-    freezeScene();
+  // Ripristina il colore del pin precedentemente selezionato
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
   }
 
+  // Aggiorna il pin selezionato
+  selectedPin = pin;
+  selectedPin.material.color.set('rgb(0, 102, 255)');
+
+  // Mostra il box informativo
   const title = document.getElementById('info-title');
   const description = document.getElementById('info-description');
-
-  title.innerText = pin.userData.label;
-  description.innerText = `Descrizione di ${pin.userData.label}`;
+  title.innerText = selectedPin.userData.label;
+  description.innerText = `Descrizione di ${selectedPin.userData.label}`;
 
   infoBox.style.display = 'block';
   infoBox.style.left = '50px';
   infoBox.style.top = '50px';
 
+  freezeScene();
   drawLineToBox(pin);
 }
 
@@ -175,7 +180,7 @@ function drawLineToBox(pin) {
   const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
   const points = [];
   points.push(pin.position.clone());
-  points.push(new THREE.Vector3(0, 0, 0)); // Cambia in base alla posizione del box
+  points.push(new THREE.Vector3(0, 0, 0));
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   line = new THREE.Line(geometry, material);
@@ -183,29 +188,22 @@ function drawLineToBox(pin) {
 }
 
 function freezeScene() {
-  isFrozen = true;
   controls.autoRotate = false;
 }
 
-function onWindowResize() {
-  const containerWidth = window.innerWidth;
-  const containerHeight = window.innerHeight;
-
-  camera.aspect = containerWidth / containerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(containerWidth, containerHeight);
-  labelRenderer.setSize(containerWidth, containerHeight);
-}
-
 function animate() {
-  if (!isFrozen) {
+  requestAnimationFrame(animate);
+
+  // Ruota il globo e le nuvole solo se la scena non è freezata
+  if (!selectedPin) {
     globe.rotation.y += 0.0001;
     cloudLayer.rotation.y += 0.0004;
 
     orbitGroups.forEach((group) => {
       group.rotation.y += 0.0002;
     });
+  } else {
+    cloudLayer.rotation.y += 0.0004;
   }
 
   controls.update();
@@ -232,6 +230,14 @@ function addParticles() {
   const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth - 300, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
 }
 
 init();

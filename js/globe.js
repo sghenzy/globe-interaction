@@ -217,7 +217,7 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Distanza minima dal pin
   const globeRadius = 0.45; // Raggio del globo
-  const minDistanceFromPin = (globeRadius / 2) * (window.innerHeight / 2); // Calcolo in pixel
+  const minDistanceFromPin = 100; // Calcolo in pixel
 
   // Sposta il box lungo la direzione pin -> box
   const dx = boxX - halfWidth;

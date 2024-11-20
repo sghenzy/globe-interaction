@@ -217,7 +217,7 @@ function addInfoBox(pinPosition, pinLabel) {
   const box = document.createElement('div');
   box.id = 'info-box';
   box.style.position = 'absolute';
-  box.style.backgroundColor = '#d6d6d6';
+  box.style.backgroundColor = ' rgba(0, 0, 84, 50)';
   box.style.backdropFilter = 'blur(10px)'; 
   box.style.padding = '10px';
   box.style.borderRadius = '5px';
@@ -225,7 +225,7 @@ function addInfoBox(pinPosition, pinLabel) {
   box.style.fontFamily = 'Gotham, sans-serif';
   box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
   box.innerHTML = `
-    <h3 style="padding-bottom: 1vh;">${pinLabel}</h3>
+    <h3 style="margin: 0;">${pinLabel}</h3>
     <p style="margin: 0;">Breve descrizione del pin selezionato</p>
   `;
 

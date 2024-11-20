@@ -254,7 +254,7 @@ function addInfoBox(pinPosition, pinLabel) {
   let boxY = pinY + normalizedY * fixedDistance + 30;
 
   // Assicura che il box non sia più vicino di 5vh dal bordo inferiore
-  const maxBoxY = window.innerHeight - (window.innerHeight * 0.05); // Limite inferiore
+  const maxBoxY = window.innerHeight - (window.innerHeight * 0.09); // Limite inferiore
   if (boxY + box.offsetHeight > maxBoxY) {
     boxY = maxBoxY - box.offsetHeight; // Riposiziona il box sopra il limite
   }

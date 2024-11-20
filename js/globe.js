@@ -182,7 +182,6 @@ function focusOnPin(pinIndex) {
 
   addInfoBox(pinWorldPosition, pin.userData.label);
 }
-
 function addInfoBox(pinPosition, pinLabel) {
   // Rimuovi eventuale info box esistente
   const existingBox = document.getElementById('info-box');
@@ -207,8 +206,8 @@ function addInfoBox(pinPosition, pinLabel) {
 
   document.body.appendChild(box);
 
-  // Imposta una distanza fissa per il box dal pin
-  const fixedDistance = 100; // Distanza fissa in pixel
+  // Imposta una distanza fissa maggiore per il box dal pin
+  const fixedDistance = 150; // Distanza fissa aumentata in pixel
   const screenPosition = pinPosition.clone().project(camera);
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;
@@ -231,18 +230,22 @@ function addInfoBox(pinPosition, pinLabel) {
   const boxY = pinY + normalizedY * fixedDistance;
 
   // Applica la posizione del box
-  box.style.left = `${boxX}px`;
-  box.style.top = `${boxY}px`;
+  box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente
+  box.style.top = `${boxY - box.offsetHeight / 2}px`; // Centra il box verticalmente
 
   // Disegna la linea dal pin al box
-  drawLineToBox(pinPosition, boxX, boxY);
+  drawLineToBox(pinPosition, boxX, boxY, box);
 }
 
-function drawLineToBox(pinPosition, boxX, boxY) {
-  // Converti le coordinate del box in coordinate 3D
+function drawLineToBox(pinPosition, boxX, boxY, box) {
+  // Calcola la posizione centrata del box
+  const boxCenterX = boxX;
+  const boxCenterY = boxY;
+
+  // Converti le coordinate 2D del box al centro in coordinate 3D
   const boxWorldPosition = new THREE.Vector3(
-    (boxX / window.innerWidth) * 2 - 1,
-    -(boxY / window.innerHeight) * 2 + 1,
+    (boxCenterX / window.innerWidth) * 2 - 1,
+    -(boxCenterY / window.innerHeight) * 2 + 1,
     0
   ).unproject(camera);
 

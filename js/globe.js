@@ -2,7 +2,7 @@ let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelR
 const pins = [];
 const orbitGroups = [];
 let selectedPin = null;
-let isFrozen = false; // Stato del globo e dei pin
+let isFrozen = false;
 
 function init() {
   const container = document.getElementById('globe-container');
@@ -89,6 +89,11 @@ function addOrbitingPins() {
     { label: "Il Cairo", inclination: 0, startRotation: 0 },
     { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
     { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },
+    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },
+    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },
+    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },
+    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },
+    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
   const orbitRadius = 0.63;
@@ -106,6 +111,8 @@ function addOrbitingPins() {
     pins.push(pin);
     orbitGroups.push(orbitGroup);
   });
+
+  console.log(`Totale pin creati: ${pins.length}`);
 }
 
 function createPin(labelText, index) {
@@ -115,7 +122,7 @@ function createPin(labelText, index) {
 
   pin.userData = { label: labelText, index: index };
 
-  pin.callback = () => handlePinClick(pin); // Aggiungi callback per il clic
+  pin.callback = () => handlePinClick(pin);
 
   const labelDiv = document.createElement('div');
   labelDiv.className = 'pin-label';
@@ -136,7 +143,7 @@ function createInfoBox() {
   infoBox = document.createElement('div');
   infoBox.id = 'info-box';
   infoBox.style.position = 'absolute';
-  infoBox.style.background = 'rgba(255, 192, 203, 0.9)'; // Rosa
+  infoBox.style.background = 'rgba(255, 192, 203, 0.9)';
   infoBox.style.padding = '10px';
   infoBox.style.borderRadius = '5px';
   infoBox.style.display = 'none';
@@ -146,20 +153,19 @@ function createInfoBox() {
 
 function handlePinClick(pin) {
   if (!isFrozen) {
-    freezeScene(); // Congela il globo e i pin
+    freezeScene();
   }
 
   const title = document.getElementById('info-title');
   const description = document.getElementById('info-description');
 
   title.innerText = pin.userData.label;
-  description.innerText = `Descrizione di ${pin.userData.label}`; // Esempio di descrizione
+  description.innerText = `Descrizione di ${pin.userData.label}`;
 
   infoBox.style.display = 'block';
   infoBox.style.left = '50px';
   infoBox.style.top = '50px';
 
-  // Disegna una linea dinamica dal pin al box
   drawLineToBox(pin);
 }
 
@@ -169,7 +175,7 @@ function drawLineToBox(pin) {
   const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
   const points = [];
   points.push(pin.position.clone());
-  points.push(new THREE.Vector3(0, 0, 0)); // Posizione del box (aggiusta se necessario)
+  points.push(new THREE.Vector3(0, 0, 0)); // Cambia in base alla posizione del box
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   line = new THREE.Line(geometry, material);
@@ -178,7 +184,7 @@ function drawLineToBox(pin) {
 
 function freezeScene() {
   isFrozen = true;
-  controls.autoRotate = false; // Ferma la rotazione del globo
+  controls.autoRotate = false;
 }
 
 function onWindowResize() {
@@ -205,6 +211,27 @@ function animate() {
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
+}
+
+function addParticles() {
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 5000;
+  const positions = new Float32Array(particlesCount * 3);
+
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    const distance = Math.random() * 10 + 2;
+    const angle1 = Math.random() * Math.PI * 2;
+    const angle2 = Math.acos((Math.random() * 2) - 1);
+
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
+  }
+
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
 }
 
 init();

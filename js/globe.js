@@ -231,7 +231,7 @@ function addInfoBox(pinPosition, pinLabel) {
   document.body.appendChild(box);
 
   // Imposta una distanza fissa maggiore per il box dal pin
-  const fixedDistance = 200; // Distanza fissa aumentata in pixel
+  const fixedDistance = 250; // Distanza fissa aumentata in pixel
   const screenPosition = pinPosition.clone().project(camera);
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;
@@ -251,15 +251,22 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Calcola la posizione del box applicando la distanza fissa
   const boxX = pinX + normalizedX * fixedDistance;
-  const boxY = pinY + normalizedY * fixedDistance + 30;
+  let boxY = pinY + normalizedY * fixedDistance + 30;
+
+  // Assicura che il box non sia più vicino di 5vh dal bordo inferiore
+  const maxBoxY = window.innerHeight - (window.innerHeight * 0.05); // Limite inferiore
+  if (boxY + box.offsetHeight > maxBoxY) {
+    boxY = maxBoxY - box.offsetHeight; // Riposiziona il box sopra il limite
+  }
 
   // Applica la posizione del box
   box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente
-  box.style.top = `${boxY - box.offsetHeight / 2}px`; // Centra il box verticalmente
+  box.style.top = `${boxY}px`; // Posiziona il box con il limite inferiore
 
   // Disegna la linea dal pin al box
   drawLineToBox(pinPosition, boxX, boxY, box);
 }
+
 
 function drawLineToBox(pinPosition, boxX, boxY, box) {
   // Calcola la posizione centrata del box

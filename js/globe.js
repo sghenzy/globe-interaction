@@ -217,11 +217,11 @@ function addInfoBox(pinPosition, pinLabel) {
   const box = document.createElement('div');
   box.id = 'info-box';
   box.style.position = 'absolute';
-  box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)';
+  box.style.backgroundColor = '#d6d6d6';
   box.style.padding = '10px';
   box.style.borderRadius = '5px';
   box.style.color = 'black';
-  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.fontFamily = 'Gotham, sans-serif';
   box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
   box.innerHTML = `
     <h3 style="margin: 0;">${pinLabel}</h3>

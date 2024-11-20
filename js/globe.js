@@ -230,6 +230,27 @@ function onMouseClick(event) {
   }
 }
 
+function addParticles() {
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particlesCount = 5000;
+  const positions = new Float32Array(particlesCount * 3);
+
+  for (let i = 0; i < particlesCount * 3; i += 3) {
+    const distance = Math.random() * 10 + 2;
+    const angle1 = Math.random() * Math.PI * 2;
+    const angle2 = Math.acos((Math.random() * 2) - 1);
+
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
+  }
+
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
+}
+
 function onWindowResize() {
   const containerWidth = window.innerWidth - 300;
   const containerHeight = window.innerHeight;
@@ -246,10 +267,6 @@ function animate() {
 
   globe.rotation.y += 0.0001;
   cloudLayer.rotation.y += 0.0004;
-
-  orbitGroups.forEach((group, index) => {
-    group.rotation.y += 0.0002 + index * 0.00002;
-  });
 
   controls.update();
   renderer.render(scene, camera);

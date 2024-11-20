@@ -211,4 +211,79 @@ function addParticles() {
   scene.add(particleSystem);
 }
 
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  // Blocca il globo e i pin, ma lascia le nuvole in movimento
+  orbitGroups.forEach((group) => {
+    group.rotation.y = group.rotation.y; // Congela i pin
+  });
+  controls.autoRotate = false; // Disabilita la rotazione automatica del globo
+
+  // Ripristina lo stato del pin precedentemente selezionato
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Verde per i pin non selezionati
+  }
+
+  // Aggiorna il nuovo pin selezionato
+  pin.material.color.set('rgb(0, 102, 255)'); // Blu per il pin selezionato
+  selectedPin = pin;
+
+  // Calcola la posizione del pin nel mondo
+  const pinWorldPosition = new THREE.Vector3();
+  pin.getWorldPosition(pinWorldPosition);
+
+  // Crea o aggiorna una linea che collega il pin al box
+  addInfoBox(pinWorldPosition, pin.userData.label);
+}
+
+function addInfoBox(pinPosition, pinLabel) {
+  // Rimuovi eventuale info box esistente
+  const existingBox = document.getElementById('info-box');
+  if (existingBox) {
+    existingBox.remove();
+  }
+
+  // Crea il box con il titolo e la descrizione
+  const box = document.createElement('div');
+  box.id = 'info-box';
+  box.style.position = 'absolute';
+  box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)'; // Rosa trasparente
+  box.style.padding = '10px';
+  box.style.borderRadius = '5px';
+  box.style.top = '50px';
+  box.style.left = '50px';
+  box.innerHTML = `
+    <h3 style="margin: 0;">${pinLabel}</h3>
+    <p style="margin: 0;">Breve descrizione del pin selezionato</p>
+  `;
+
+  // Aggiungi il box al documento
+  document.body.appendChild(box);
+
+  // Crea una linea rossa che collega il pin al box
+  drawLineToBox(pinPosition);
+}
+
+function drawLineToBox(pinPosition) {
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const lineGeometry = new THREE.BufferGeometry();
+
+  // Calcola le coordinate 3D del pin e le coordinate 2D del box
+  const boxPosition = new THREE.Vector3(-2, 2, 0); // Fai il mapping a coordinate statiche
+  lineGeometry.setFromPoints([pinPosition, boxPosition]);
+
+  // Aggiungi la linea alla scena
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(line);
+
+  // Rimuovi la linea precedente se esiste
+  if (scene.userData.lastLine) {
+    scene.remove(scene.userData.lastLine);
+  }
+  scene.userData.lastLine = line;
+}
+
+
 init();

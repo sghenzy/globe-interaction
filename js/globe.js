@@ -207,44 +207,42 @@ function addInfoBox(pinPosition, pinLabel) {
 
   document.body.appendChild(box);
 
-  // Calcola la posizione 2D del pin sulla schermata
+  // Calcola la posizione del box basata sulla distanza minima
+  const globeRadius = 0.45; // Raggio del globo
+  const minDistanceFromPin = globeRadius * 0.5; // Distanza minima dal pin
   const screenPosition = pinPosition.clone().project(camera);
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;
 
-  // Calcola posizione iniziale del box
+  // Posizione iniziale del box
   let boxX = (screenPosition.x * halfWidth) + halfWidth;
   let boxY = -(screenPosition.y * halfHeight) + halfHeight;
 
-  // Calcola la distanza minima dal pin
-  const globeRadius = 0.45; // Raggio del globo
-  const minDistanceFromPin = (globeRadius / 2) * (window.innerHeight / 2); // Convertito in pixel
-
-  // Sposta il box lungo la direzione dal pin al box
+  // Calcola la direzione per posizionare il box
   const dx = boxX - halfWidth;
   const dy = boxY - halfHeight;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
+  // Se il box è troppo vicino, lo sposta di una distanza minima
   if (distance < minDistanceFromPin) {
     const scaleFactor = minDistanceFromPin / distance;
     boxX = halfWidth + dx * scaleFactor;
     boxY = halfHeight + dy * scaleFactor;
   }
 
-  // Applica la posizione finale del box
+  // Applica la posizione del box
   box.style.left = `${boxX}px`;
   box.style.top = `${boxY}px`;
 
-  // Disegna la linea verso il box
+  // Disegna la linea dal pin al box
   drawLineToBox(pinPosition, boxX, boxY);
 }
 
 function drawLineToBox(pinPosition, boxX, boxY) {
-  // Converti le coordinate 2D del box in coordinate 3D
+  // Converti le coordinate del box in 3D usando unmapping dalla camera
   const boxWorldPosition = new THREE.Vector3(
     (boxX / window.innerWidth) * 2 - 1,
-    -(boxY / window.innerHeight) * 2 + 1,
-    0
+    -(boxY / window.innerHeight) * 2 + 1,    0
   ).unproject(camera);
 
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
@@ -253,16 +251,17 @@ function drawLineToBox(pinPosition, boxX, boxY) {
   // Imposta i punti della linea
   lineGeometry.setFromPoints([pinPosition, boxWorldPosition]);
 
-  // Crea la linea
-  const line = new THREE.Line(lineGeometry, lineMaterial);
-
   // Rimuovi la linea precedente se esiste
   if (scene.userData.lastLine) {
     scene.remove(scene.userData.lastLine);
   }
+
+  // Aggiungi la nuova linea
+  const line = new THREE.Line(lineGeometry, lineMaterial);
   scene.userData.lastLine = line;
   scene.add(line);
 }
+
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

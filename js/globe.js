@@ -212,14 +212,15 @@ function addInfoBox(pinPosition, pinLabel) {
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;
 
+  // Calcola posizione iniziale del box
   let boxX = (screenPosition.x * halfWidth) + halfWidth;
   let boxY = -(screenPosition.y * halfHeight) + halfHeight;
 
   // Distanza minima dal pin
   const globeRadius = 0.45; // Raggio del globo
-  const minDistanceFromPin = 100; // Calcolo in pixel
+  const minDistanceFromPin = (globeRadius / 2) * (window.innerHeight / 2); // Convertito in pixel
 
-  // Sposta il box lungo la direzione pin -> box
+  // Sposta il box lungo la direzione dal pin al box
   const dx = boxX - halfWidth;
   const dy = boxY - halfHeight;
   const distance = Math.sqrt(dx * dx + dy * dy);
@@ -230,7 +231,7 @@ function addInfoBox(pinPosition, pinLabel) {
     boxY = halfHeight + dy * scaleFactor;
   }
 
-  // Applica la posizione al box
+  // Applica la posizione finale del box
   box.style.left = `${boxX}px`;
   box.style.top = `${boxY}px`;
 
@@ -242,7 +243,7 @@ function drawLineToBox(pinPosition, boxScreenPosition) {
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
   const lineGeometry = new THREE.BufferGeometry();
 
-  // Converte le coordinate 2D del box in coordinate di mondo
+  // Converti la posizione del box in coordinate 3D
   const boxWorldPosition = new THREE.Vector3(
     (boxScreenPosition.x / window.innerWidth) * 2 - 1,
     -(boxScreenPosition.y / window.innerHeight) * 2 + 1,
@@ -262,6 +263,7 @@ function drawLineToBox(pinPosition, boxScreenPosition) {
   scene.userData.lastLine = line;
   scene.add(line);
 }
+
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

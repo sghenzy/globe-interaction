@@ -227,7 +227,7 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Calcola la posizione del box applicando la distanza fissa
   const boxX = pinX + normalizedX * fixedDistance;
-  const boxY = pinY + normalizedY * fixedDistance - 30;
+  const boxY = pinY + normalizedY * fixedDistance + 30;
 
   // Applica la posizione del box
   box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente

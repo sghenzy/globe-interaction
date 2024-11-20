@@ -163,6 +163,25 @@ function onMouseClick(event) {
   }
 }
 
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  orbitGroups.forEach(group => group.rotation.y = group.rotation.y);
+  controls.autoRotate = false;
+
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+  }
+
+  pin.material.color.set('rgb(0, 102, 255)');
+  selectedPin = pin;
+
+  const pinWorldPosition = new THREE.Vector3();
+  pin.getWorldPosition(pinWorldPosition);
+
+  addInfoBox(pinWorldPosition, pin.userData.label);
+}
 function addInfoBox(pinPosition, pinLabel) {
   // Rimuovi eventuale info box esistente
   const existingBox = document.getElementById('info-box');

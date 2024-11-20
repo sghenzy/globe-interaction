@@ -51,7 +51,7 @@ function init() {
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.6, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.64, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   
@@ -68,7 +68,7 @@ function addGlobe() {
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.605, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.641, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
@@ -95,7 +95,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.5;
+  const orbitRadius = 0.7;
 
   pinPositions.forEach((pos, index) => {
     const orbitGroup = new THREE.Group();

@@ -163,25 +163,6 @@ function onMouseClick(event) {
   }
 }
 
-function focusOnPin(pinIndex) {
-  const pin = pins[pinIndex];
-  if (!pin) return;
-
-  orbitGroups.forEach(group => group.rotation.y = group.rotation.y);
-  controls.autoRotate = false;
-
-  if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-  }
-
-  pin.material.color.set('rgb(0, 102, 255)');
-  selectedPin = pin;
-
-  const pinWorldPosition = new THREE.Vector3();
-  pin.getWorldPosition(pinWorldPosition);
-
-  addInfoBox(pinWorldPosition, pin.userData.label);
-}
 function addInfoBox(pinPosition, pinLabel) {
   // Rimuovi eventuale info box esistente
   const existingBox = document.getElementById('info-box');
@@ -298,12 +279,101 @@ function onWindowResize() {
   labelRenderer.setSize(containerWidth, containerHeight);
 }
 
+function setupBackgroundClickListener() {
+  // Aggiungi un event listener al documento per rilevare click sullo sfondo
+  document.addEventListener('click', (event) => {
+    // Controlla se il target del click è un pin o l'infobox
+    if (
+      event.target.closest('.pin-label') || // Escludi il click sull'etichetta del pin
+      event.target.closest('#info-box') // Escludi il click sull'infobox
+    ) {
+      return; // Non fare nulla se il click è su un pin o sul box
+    }
+
+    // Ripristina lo stato originale
+    resetFocus();
+  });
+}
+
+function resetFocus() {
+  // Ripristina il colore del pin precedentemente selezionato
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Verde per i pin non selezionati
+    selectedPin = null; // Nessun pin selezionato
+  }
+
+  // Rimuovi il box informativo
+  const existingBox = document.getElementById('info-box');
+  if (existingBox) {
+    existingBox.remove();
+  }
+
+  // Rimuovi la linea
+  if (scene.userData.lastLine) {
+    scene.remove(scene.userData.lastLine);
+    scene.userData.lastLine = null;
+  }
+
+  // Riattiva la rotazione automatica del globo e dei pin
+  controls.autoRotate = true; // Riattiva la rotazione automatica del globo
+  orbitGroups.forEach((group) => {
+    group.userData.isFrozen = false; // Sblocca i gruppi orbitali
+  });
+}
+
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
+
+  // Congela il globo e i pin, ma lascia le nuvole in movimento
+  controls.autoRotate = false; // Disabilita la rotazione automatica del globo
+  orbitGroups.forEach((group) => {
+    group.userData.isFrozen = true; // Congela i gruppi orbitali
+  });
+
+  // Ripristina lo stato del pin precedentemente selezionato
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)'); // Verde per i pin non selezionati
+  }
+
+  // Aggiorna il nuovo pin selezionato
+  pin.material.color.set('rgb(0, 102, 255)'); // Blu per il pin selezionato
+  selectedPin = pin;
+
+  // Calcola la posizione del pin nel mondo
+  const pinWorldPosition = new THREE.Vector3();
+  pin.getWorldPosition(pinWorldPosition);
+
+  // Crea o aggiorna una linea che collega il pin al box
+  addInfoBox(pinWorldPosition, pin.userData.label);
+}
+
+// Aggiorna l'animazione per verificare lo stato di "congelamento"
 function animate() {
   requestAnimationFrame(animate);
+
+  // Ruota il globo sull'asse Y solo se non è congelato
+  if (!controls.autoRotate) {
+    globe.rotation.y += 0.0001;
+  }
+
+  // Ruota il livello delle nuvole sempre
   cloudLayer.rotation.y += 0.0004;
+
+  // Ruota ciascun gruppo orbitale se non è congelato
+  orbitGroups.forEach((group) => {
+    if (!group.userData.isFrozen) {
+      const rotationSpeed = 0.0002;
+      group.rotation.y += rotationSpeed;
+    }
+  });
+
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
+
+// Aggiungi il listener per il click sullo sfondo
+setupBackgroundClickListener();
 
 init();

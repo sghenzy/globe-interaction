@@ -1,4 +1,4 @@
-let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer, selectedPin = null, infoBox, infoLine;
+let scene, camera, renderer, globe, cloudLayer, controls, particleSystem, labelRenderer, selectedPin = null;
 
 const pins = [];
 const orbitGroups = []; // Gruppi per i pin in orbita
@@ -47,8 +47,8 @@ function init() {
   // Aggiungi i pin in orbita attorno al globo
   addOrbitingPins();
 
-  // Crea il box informativo e la linea
-  createInfoBox();
+  // Event listener per il clic del mouse
+  window.addEventListener('pointerdown', onMouseClick);
 
   // Imposta i controlli per la telecamera
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -64,9 +64,6 @@ function init() {
   // Event listener per il ridimensionamento
   window.addEventListener('resize', onWindowResize);
   onWindowResize();
-
-  // Event listener per i clic del mouse
-  window.addEventListener('pointerdown', onMouseClick);
 
   // Aggiungi particelle
   addParticles();
@@ -135,9 +132,8 @@ function addOrbitingPins() {
     pin.position.x = orbitRadius;
 
     pin.userData = {
-      index,
-      label: pos.label,
-      orbitGroup
+      index: index,
+      label: pos.label
     };
 
     orbitGroup.add(pin);
@@ -150,74 +146,11 @@ function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16);
   const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(144, 238, 144)' });
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+
   return pin;
 }
 
-function createInfoBox() {
-  infoBox = document.createElement('div');
-  infoBox.className = 'info-box';
-  infoBox.style.position = 'absolute';
-  infoBox.style.backgroundColor = 'rgba(255, 192, 203, 0.9)';
-  infoBox.style.padding = '10px';
-  infoBox.style.borderRadius = '5px';
-  infoBox.style.display = 'none';
-  document.body.appendChild(infoBox);
-
-  infoLine = new THREE.Line(
-    new THREE.BufferGeometry(),
-    new THREE.LineBasicMaterial({ color: 0xff0000 })
-  );
-  scene.add(infoLine);
-}
-
-function updateInfoBox(pinIndex) {
-  const pin = pins[pinIndex];
-  const worldPosition = new THREE.Vector3();
-  pin.getWorldPosition(worldPosition);
-
-  const boxPosition = calculateBoxPosition(worldPosition);
-  const linePoints = [worldPosition, boxPosition];
-  updateLineGeometry(linePoints);
-
-  const screenPosition = boxPosition.clone().project(camera);
-
-  const x = (screenPosition.x * 0.5 + 0.5) * window.innerWidth;
-  const y = -(screenPosition.y * 0.5 - 0.5) * window.innerHeight;
-
-  infoBox.style.left = `${x}px`;
-  infoBox.style.top = `${y}px`;
-  infoBox.innerHTML = `
-    <strong>${pin.userData.label}</strong><br>
-    Breve descrizione del pin selezionato
-  `;
-  infoBox.style.display = 'block';
-}
-
-function calculateBoxPosition(worldPosition) {
-  const direction = worldPosition.clone().normalize();
-  const boxDistance = 0.7;
-  return direction.multiplyScalar(boxDistance);
-}
-
-function updateLineGeometry(points) {
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-  infoLine.geometry.dispose();
-  infoLine.geometry = lineGeometry;
-}
-
-function focusOnPin(pinIndex) {
-  if (selectedPin !== null) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-  }
-
-  selectedPin = pins[pinIndex];
-  selectedPin.material.color.set('rgb(0, 102, 255)');
-
-  updateInfoBox(pinIndex);
-}
-
 function onMouseClick(event) {
-  event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -230,44 +163,68 @@ function onMouseClick(event) {
   }
 }
 
-function addParticles() {
-  const particlesGeometry = new THREE.BufferGeometry();
-  const particlesCount = 5000;
-  const positions = new Float32Array(particlesCount * 3);
+function focusOnPin(pinIndex) {
+  const pin = pins[pinIndex];
+  if (!pin) return;
 
-  for (let i = 0; i < particlesCount * 3; i += 3) {
-    const distance = Math.random() * 10 + 2;
-    const angle1 = Math.random() * Math.PI * 2;
-    const angle2 = Math.acos((Math.random() * 2) - 1);
+  orbitGroups.forEach(group => group.rotation.y = group.rotation.y);
+  controls.autoRotate = false;
 
-    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
-    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
-    positions[i + 2] = distance * Math.cos(angle2);
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
   }
 
-  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
-  particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
-  scene.add(particleSystem);
+  pin.material.color.set('rgb(0, 102, 255)');
+  selectedPin = pin;
+
+  const pinWorldPosition = new THREE.Vector3();
+  pin.getWorldPosition(pinWorldPosition);
+
+  addInfoBox(pinWorldPosition, pin.userData.label);
 }
 
-function onWindowResize() {
-  const containerWidth = window.innerWidth - 300;
-  const containerHeight = window.innerHeight;
+function addInfoBox(pinPosition, pinLabel) {
+  const existingBox = document.getElementById('info-box');
+  if (existingBox) existingBox.remove();
 
-  camera.aspect = containerWidth / containerHeight;
-  camera.updateProjectionMatrix();
+  const box = document.createElement('div');
+  box.id = 'info-box';
+  box.style.position = 'absolute';
+  box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)';
+  box.style.padding = '10px';
+  box.style.borderRadius = '5px';
+  box.innerHTML = `
+    <h3>${pinLabel}</h3>
+    <p>Breve descrizione del pin selezionato</p>
+  `;
+  document.body.appendChild(box);
 
-  renderer.setSize(containerWidth, containerHeight);
-  labelRenderer.setSize(containerWidth, containerHeight);
+  drawLineToBox(pinPosition, box);
+}
+
+function drawLineToBox(pinPosition, box) {
+  const rect = box.getBoundingClientRect();
+  const boxPosition = new THREE.Vector3(
+    (rect.left + rect.width / 2) / window.innerWidth * 2 - 1,
+    -(rect.top + rect.height / 2) / window.innerHeight * 2 + 1,
+    0
+  );
+
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([pinPosition, boxPosition]);
+
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+
+  if (scene.userData.lastLine) {
+    scene.remove(scene.userData.lastLine);
+  }
+  scene.userData.lastLine = line;
+  scene.add(line);
 }
 
 function animate() {
   requestAnimationFrame(animate);
-
-  globe.rotation.y += 0.0001;
   cloudLayer.rotation.y += 0.0004;
-
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);

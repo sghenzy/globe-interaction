@@ -231,7 +231,7 @@ function addInfoBox(pinPosition, pinLabel) {
   document.body.appendChild(box);
 
   // Imposta una distanza fissa maggiore per il box dal pin
-  const fixedDistance = 250; // Distanza fissa aumentata in pixel
+  const fixedDistance = 200; // Distanza fissa aumentata in pixel
   const screenPosition = pinPosition.clone().project(camera);
   const halfWidth = window.innerWidth / 2;
   const halfHeight = window.innerHeight / 2;

@@ -174,67 +174,78 @@ function addInfoBox(pinPosition, pinLabel) {
   const box = document.createElement('div');
   box.id = 'info-box';
   box.style.position = 'absolute';
-  box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)'; // Rosa trasparente
+  box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)';
   box.style.padding = '10px';
   box.style.borderRadius = '5px';
-
-  // Calcola la posizione del box applicando la distanza fissa
-  const fixedDistance = 150; // Distanza minima dal pin
-  const screenPosition = new THREE.Vector3(pinPosition.x, pinPosition.y, pinPosition.z);
-  screenPosition.project(camera);
-
-  const normalizedX = screenPosition.x;
-  const normalizedY = screenPosition.y;
-
-  const boxX = (window.innerWidth / 2) + (normalizedX * window.innerWidth / 2) + fixedDistance;
-  const boxY = (window.innerHeight / 2) - (normalizedY * window.innerHeight / 2) - fixedDistance;
-
-  box.style.left = `${boxX}px`;
-  box.style.top = `${boxY}px`;
-
+  box.style.color = 'black';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
   box.innerHTML = `
     <h3 style="margin: 0;">${pinLabel}</h3>
     <p style="margin: 0;">Breve descrizione del pin selezionato</p>
   `;
 
-  // Aggiungi il box al documento
   document.body.appendChild(box);
 
-  // Crea una linea rossa che collega il pin al box
-  drawLineToBox(pinPosition, boxX, boxY);
+  // Imposta una distanza fissa maggiore per il box dal pin
+  const fixedDistance = 250; // Distanza fissa aumentata in pixel
+  const screenPosition = pinPosition.clone().project(camera);
+  const halfWidth = window.innerWidth / 2;
+  const halfHeight = window.innerHeight / 2;
+
+  // Coordinate del pin sullo schermo
+  const pinX = (screenPosition.x * halfWidth) + halfWidth;
+  const pinY = -(screenPosition.y * halfHeight) + halfHeight;
+
+  // Calcola la direzione dal pin per posizionare il box
+  const directionX = pinX - halfWidth;
+  const directionY = pinY - halfHeight;
+  const length = Math.sqrt(directionX * directionX + directionY * directionY);
+
+  // Normalizza la direzione per applicare la distanza fissa
+  const normalizedX = directionX / length;
+  const normalizedY = directionY / length;
+
+  // Calcola la posizione del box applicando la distanza fissa
+  const boxX = pinX + normalizedX * fixedDistance;
+  const boxY = pinY + normalizedY * fixedDistance - 20;
+
+  // Applica la posizione del box
+  box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente
+  box.style.top = `${boxY - box.offsetHeight / 2}px`; // Centra il box verticalmente
+
+  // Disegna la linea dal pin al box
+  drawLineToBox(pinPosition, boxX, boxY, box);
 }
 
-function drawLineToBox(pinPosition, boxX, boxY) {
+function drawLineToBox(pinPosition, boxX, boxY, box) {
+  // Calcola la posizione centrata del box
+  const boxCenterX = boxX;
+  const boxCenterY = boxY;
+
+  // Converti le coordinate 2D del box al centro in coordinate 3D
+  const boxWorldPosition = new THREE.Vector3(
+    (boxCenterX / window.innerWidth) * 2 - 1,
+    -(boxCenterY / window.innerHeight) * 2 + 1,
+    0
+  ).unproject(camera);
+
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
   const lineGeometry = new THREE.BufferGeometry();
 
-  // Calcola la posizione 3D del pin e mappa la posizione 2D del box in 3D
-  const boxPosition = new THREE.Vector3(
-    (boxX - window.innerWidth / 2) / (window.innerWidth / 2),
-    -(boxY - window.innerHeight / 2) / (window.innerHeight / 2),
-    0
-  );
-
-  boxPosition.unproject(camera);
-  boxPosition.sub(camera.position).normalize();
-  boxPosition.multiplyScalar(3); // Avvicina la posizione al box
-
-  lineGeometry.setFromPoints([pinPosition, boxPosition]);
-
-  // Aggiungi la linea alla scena
-  const line = new THREE.Line(lineGeometry, lineMaterial);
+  // Imposta i punti della linea
+  lineGeometry.setFromPoints([pinPosition, boxWorldPosition]);
 
   // Rimuovi la linea precedente se esiste
   if (scene.userData.lastLine) {
     scene.remove(scene.userData.lastLine);
   }
 
-  scene.add(line);
+  // Aggiungi la nuova linea
+  const line = new THREE.Line(lineGeometry, lineMaterial);
   scene.userData.lastLine = line;
+  scene.add(line);
 }
-
-// Setup il listener per il click sullo sfondo
-setupBackgroundClickListener();
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
@@ -274,8 +285,7 @@ function setupBackgroundClickListener() {
     // Controlla se il target del click è un pin o l'infobox
     if (
       event.target.closest('.pin-label') || // Escludi il click sull'etichetta del pin
-      event.target.closest('#info-box') || // Escludi il click sull'infobox
-      event.target.classList.contains('pin') // Escludi il click su un pin
+      event.target.closest('#info-box') // Escludi il click sull'infobox
     ) {
       return; // Non fare nulla se il click è su un pin o sul box
     }
@@ -322,17 +332,11 @@ function focusOnPin(pinIndex) {
   });
 
   // Ripristina lo stato del pin precedentemente selezionato
-  if (selectedPin && selectedPin !== pin) {
+  if (selectedPin) {
     selectedPin.material.color.set('rgb(144, 238, 144)'); // Verde per i pin non selezionati
   }
 
   // Aggiorna il nuovo pin selezionato
-  if (selectedPin === pin) {
-    // Deseleziona il pin se è già selezionato
-    resetFocus();
-    return;
-  }
-
   pin.material.color.set('rgb(0, 102, 255)'); // Blu per il pin selezionato
   selectedPin = pin;
 
@@ -368,5 +372,8 @@ function animate() {
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
+
+// Aggiungi il listener per il click sullo sfondo
+setupBackgroundClickListener();
 
 init();

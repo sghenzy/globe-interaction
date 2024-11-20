@@ -225,7 +225,7 @@ function addInfoBox(pinPosition, pinLabel) {
   box.style.fontFamily = 'Gotham, sans-serif';
   box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
   box.innerHTML = `
-    <h3 style="margin-bottom: 8;">${pinLabel}</h3>
+    <h3 style="margin-bottom: 2vh;">${pinLabel}</h3>
     <p style="margin: 0;">Breve descrizione del pin selezionato</p>
   `;
 

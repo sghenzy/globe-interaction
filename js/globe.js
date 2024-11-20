@@ -184,37 +184,81 @@ function focusOnPin(pinIndex) {
 }
 
 function addInfoBox(pinPosition, pinLabel) {
+  // Rimuovi eventuale info box esistente
   const existingBox = document.getElementById('info-box');
-  if (existingBox) existingBox.remove();
+  if (existingBox) {
+    existingBox.remove();
+  }
 
+  // Crea il box con il titolo e la descrizione
   const box = document.createElement('div');
   box.id = 'info-box';
   box.style.position = 'absolute';
   box.style.backgroundColor = 'rgba(255, 192, 203, 0.9)';
   box.style.padding = '10px';
   box.style.borderRadius = '5px';
+  box.style.color = 'black';
+  box.style.fontFamily = 'Arial, sans-serif';
+  box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
   box.innerHTML = `
-    <h3>${pinLabel}</h3>
-    <p>Breve descrizione del pin selezionato</p>
+    <h3 style="margin: 0;">${pinLabel}</h3>
+    <p style="margin: 0;">Breve descrizione del pin selezionato</p>
   `;
+
   document.body.appendChild(box);
 
-  drawLineToBox(pinPosition, box);
+  // Calcola la posizione 2D del pin sulla schermata
+  const screenPosition = pinPosition.clone().project(camera);
+  const halfWidth = window.innerWidth / 2;
+  const halfHeight = window.innerHeight / 2;
+
+  let boxX = (screenPosition.x * halfWidth) + halfWidth;
+  let boxY = -(screenPosition.y * halfHeight) + halfHeight;
+
+  // Distanza minima del box dal centro del globo
+  const minDistanceFromGlobe = 100; // Distanza minima in pixel
+
+  // Riposizionamento dinamico per mantenere una distanza minima
+  const globeCenter = new THREE.Vector3(0, 0, 0).project(camera);
+  const globeScreenX = (globeCenter.x * halfWidth) + halfWidth;
+  const globeScreenY = -(globeCenter.y * halfHeight) + halfHeight;
+
+  const dx = boxX - globeScreenX;
+  const dy = boxY - globeScreenY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < minDistanceFromGlobe) {
+    const scaleFactor = minDistanceFromGlobe / distance;
+    boxX = globeScreenX + dx * scaleFactor;
+    boxY = globeScreenY + dy * scaleFactor;
+  }
+
+  // Applica la posizione al box
+  box.style.left = `${boxX}px`;
+  box.style.top = `${boxY}px`;
+
+  // Disegna la linea verso il box
+  drawLineToBox(pinPosition, { x: boxX, y: boxY });
 }
 
-function drawLineToBox(pinPosition, box) {
-  const rect = box.getBoundingClientRect();
-  const boxPosition = new THREE.Vector3(
-    (rect.left + rect.width / 2) / window.innerWidth * 2 - 1,
-    -(rect.top + rect.height / 2) / window.innerHeight * 2 + 1,
-    0
-  );
-
+function drawLineToBox(pinPosition, boxScreenPosition) {
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints([pinPosition, boxPosition]);
+  const lineGeometry = new THREE.BufferGeometry();
 
+  // Converte le coordinate 2D del box in coordinate di mondo
+  const boxWorldPosition = new THREE.Vector3(
+    (boxScreenPosition.x / window.innerWidth) * 2 - 1,
+    -(boxScreenPosition.y / window.innerHeight) * 2 + 1,
+    0
+  ).unproject(camera);
+
+  // Imposta i punti della linea
+  lineGeometry.setFromPoints([pinPosition, boxWorldPosition]);
+
+  // Crea la linea
   const line = new THREE.Line(lineGeometry, lineMaterial);
 
+  // Rimuovi la linea precedente se esiste
   if (scene.userData.lastLine) {
     scene.remove(scene.userData.lastLine);
   }

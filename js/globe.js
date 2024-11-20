@@ -281,7 +281,7 @@ function drawLineToBox(pinPosition, boxX, boxY, box) {
     0
   ).unproject(camera);
 
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x807d7d });
   const lineGeometry = new THREE.BufferGeometry();
 
   // Imposta i punti della linea

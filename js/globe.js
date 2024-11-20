@@ -160,6 +160,8 @@ function onMouseClick(event) {
   if (intersects.length > 0) {
     const pin = intersects[0].object;
     focusOnPin(pin.userData.index);
+  } else {
+    resetScene(); // Aggiunto: Reset scena se clicco fuori dai pin
   }
 }
 
@@ -182,6 +184,28 @@ function focusOnPin(pinIndex) {
 
   addInfoBox(pinWorldPosition, pin.userData.label);
 }
+
+function resetScene() {
+  const existingBox = document.getElementById('info-box');
+  if (existingBox) {
+    existingBox.remove();
+  }
+  if (scene.userData.lastLine) {
+    scene.remove(scene.userData.lastLine);
+    scene.userData.lastLine = null;
+  }
+
+  orbitGroups.forEach(group => {
+    group.rotation.y += 0.0002; // Ripristina la rotazione dei pin
+  });
+  controls.autoRotate = true; // Riattiva rotazione del globo
+
+  if (selectedPin) {
+    selectedPin.material.color.set('rgb(144, 238, 144)');
+    selectedPin = null;
+  }
+}
+
 function addInfoBox(pinPosition, pinLabel) {
   // Rimuovi eventuale info box esistente
   const existingBox = document.getElementById('info-box');

@@ -64,7 +64,7 @@ function init() {
 }
 
 function addGlobe() {
-  const geometry = new THREE.SphereGeometry(0.6, 64, 64);
+  const geometry = new THREE.SphereGeometry(0.45, 64, 64);
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
   
@@ -81,7 +81,7 @@ function addGlobe() {
 }
 
 function addCloudLayer() {
-  const geometry = new THREE.SphereGeometry(0.605, 64, 64); // Raggio leggermente più grande del globo
+  const geometry = new THREE.SphereGeometry(0.48, 64, 64); // Raggio leggermente più grande del globo
   const textureLoader = new THREE.TextureLoader();
   const cloudsTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/fair_clouds_8k.jpg');
 
@@ -108,7 +108,7 @@ function addOrbitingPins() {
     { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
   ];
 
-  const orbitRadius = 0.63; // Raggio dell'orbita dei pin
+  const orbitRadius = 0.5; // Raggio dell'orbita dei pin
 
   pinPositions.forEach((pos, index) => {
     // Crea un gruppo orbitale per ciascun pin

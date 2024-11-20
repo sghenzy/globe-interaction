@@ -324,10 +324,26 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
+
+  // Mantieni in rotazione il livello delle nuvole
   cloudLayer.rotation.y += 0.0004;
+
+  // Mantieni in rotazione le particelle di sfondo
+  if (particleSystem) {
+    particleSystem.rotation.y += 0.0002; // Rotazione lenta delle particelle
+  }
+
+  // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
+  if (controls.autoRotate) {
+    orbitGroups.forEach(group => {
+      group.rotation.y += 0.0002; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+    });
+  }
+
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
+
 
 init();

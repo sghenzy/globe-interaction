@@ -66,7 +66,7 @@ function init() {
   onWindowResize();
 
   // Event listener per i clic del mouse
-  window.addEventListener('click', onMouseClick);
+  window.addEventListener('pointerdown', onMouseClick);
 
   // Aggiungi particelle
   addParticles();
@@ -195,7 +195,7 @@ function updateInfoBox(pinIndex) {
 
 function calculateBoxPosition(worldPosition) {
   const direction = worldPosition.clone().normalize();
-  const boxDistance = 0.7; // Distanza minima dal globo
+  const boxDistance = 0.7;
   return direction.multiplyScalar(boxDistance);
 }
 

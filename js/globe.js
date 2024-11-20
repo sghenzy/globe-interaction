@@ -214,7 +214,7 @@ function addInfoBox(pinPosition, pinLabel) {
 
   // Coordinate del pin sullo schermo
   const pinX = (screenPosition.x * halfWidth) + halfWidth;
-  const pinY = -(screenPosition.y * halfHeight) + halfHeight - 50;
+  const pinY = -(screenPosition.y * halfHeight) + halfHeight + 30;
 
   // Calcola la direzione dal pin per posizionare il box
   const directionX = pinX - halfWidth;

@@ -35,7 +35,7 @@ html, body {
   align-items: center;
   overflow: hidden;
   position: relative;
-  background-color: #161616; /* Assicurati che il background sia dello stesso colore della scena */
+  background-color: #0f0f0f; /* Assicurati che il background sia dello stesso colore della scena */
 }
 
 canvas, .three-canvas {

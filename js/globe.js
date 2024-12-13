@@ -306,33 +306,74 @@ function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
+  const opacities = new Float32Array(particlesCount); // Nuovo attributo per l'opacità
 
-  for (let i = 0; i < particlesCount * 3; i += 3) {
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+
+  for (let i = 0; i < particlesCount; i++) {
+    // Genera posizione casuale 3D
     const distance = Math.random() * 10 + 2;
     const angle1 = Math.random() * Math.PI * 2;
     const angle2 = Math.acos((Math.random() * 2) - 1);
 
-    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
-    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
-    positions[i + 2] = distance * Math.cos(angle2);
+    const x = distance * Math.sin(angle2) * Math.cos(angle1);
+    const y = distance * Math.sin(angle2) * Math.sin(angle1);
+    const z = distance * Math.cos(angle2);
+
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = z;
+
+    // Calcola la distanza radiale proiettata
+    const screenPosition = new THREE.Vector3(x, y, z).project(camera);
+    const screenX = (screenPosition.x * centerX) + centerX;
+    const screenY = -(screenPosition.y * centerY) + centerY;
+    const distanceFromCenter = Math.sqrt(
+      (screenX - centerX) ** 2 + (screenY - centerY) ** 2
+    );
+
+    // Calcola l'opacità basata sulla distanza dal centro
+    opacities[i] = 1 - Math.min(distanceFromCenter / maxDistance, 1);
   }
 
   particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particlesGeometry.setAttribute('opacity', new THREE.BufferAttribute(opacities, 1));
+
+  const particlesMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.01,
+    transparent: true,
+    vertexColors: false // Opacità personalizzata
+  });
+
+  // Usa un aggiornamento per gestire l'opacità variabile
+  particlesMaterial.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader.replace(
+      `void main() {`,
+      `attribute float opacity;
+       varying float vOpacity;
+       void main() {
+         vOpacity = opacity;`
+    );
+
+    shader.fragmentShader = shader.fragmentShader.replace(
+      `void main() {`,
+      `varying float vOpacity;
+       void main() {`
+    );
+
+    shader.fragmentShader = shader.fragmentShader.replace(
+      `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
+      `gl_FragColor = vec4(outgoingLight, vOpacity);`
+    );
+  };
+
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
 }
 
-function onWindowResize() {
-  let containerWidth = window.innerWidth;
-  const containerHeight = window.innerHeight;
-
-  camera.aspect = containerWidth / containerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(containerWidth, containerHeight);
-  labelRenderer.setSize(containerWidth, containerHeight);
-}
 
 function animate() {
   requestAnimationFrame(animate);

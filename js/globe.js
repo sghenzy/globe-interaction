@@ -306,64 +306,32 @@ function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
-  const opacities = new Float32Array(particlesCount); // Aggiunta opacità personalizzata
 
-  for (let i = 0; i < particlesCount; i++) {
-    // Genera posizione casuale 3D
+  for (let i = 0; i < particlesCount * 3; i += 3) {
     const distance = Math.random() * 10 + 2;
     const angle1 = Math.random() * Math.PI * 2;
     const angle2 = Math.acos((Math.random() * 2) - 1);
 
-    const x = distance * Math.sin(angle2) * Math.cos(angle1);
-    const y = distance * Math.sin(angle2) * Math.sin(angle1);
-    const z = distance * Math.cos(angle2);
-
-    positions[i * 3] = x;
-    positions[i * 3 + 1] = y;
-    positions[i * 3 + 2] = z;
-
-    // Calcola la distanza radiale dal centro
-    const screenPosition = new THREE.Vector3(x, y, z).project(camera);
-    const radialDistance = Math.sqrt(screenPosition.x ** 2 + screenPosition.y ** 2);
-
-    // Mappa la distanza in un range di opacità
-    opacities[i] = Math.max(1 - radialDistance * 1.5, 0); // Scala e limita tra 0 e 1
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
   }
 
   particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  particlesGeometry.setAttribute('opacity', new THREE.BufferAttribute(opacities, 1));
-
-  const particlesMaterial = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 0.01,
-    transparent: true,
-    vertexColors: true
-  });
-
-  // Modifica il material per considerare l'opacità personalizzata
-  particlesMaterial.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader.replace(
-      `void main() {`,
-      `attribute float opacity;
-       varying float vOpacity;
-       void main() {
-         vOpacity = opacity;`
-    );
-
-    shader.fragmentShader = shader.fragmentShader.replace(
-      `void main() {`,
-      `varying float vOpacity;
-       void main() {`
-    );
-
-    shader.fragmentShader = shader.fragmentShader.replace(
-      `gl_FragColor = vec4( outgoingLight, diffuseColor.a );`,
-      `gl_FragColor = vec4(outgoingLight, vOpacity);`
-    );
-  };
-
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
+}
+
+function onWindowResize() {
+  let containerWidth = window.innerWidth;
+  const containerHeight = window.innerHeight;
+
+  camera.aspect = containerWidth / containerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(containerWidth, containerHeight);
+  labelRenderer.setSize(containerWidth, containerHeight);
 }
 
 function animate() {

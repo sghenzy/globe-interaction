@@ -306,11 +306,7 @@ function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
-  const opacities = new Float32Array(particlesCount); // Nuovo attributo per l'opacità
-
-  const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
-  const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+  const opacities = new Float32Array(particlesCount); // Aggiunta opacità personalizzata
 
   for (let i = 0; i < particlesCount; i++) {
     // Genera posizione casuale 3D
@@ -326,16 +322,12 @@ function addParticles() {
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = z;
 
-    // Calcola la distanza radiale proiettata
+    // Calcola la distanza radiale dal centro
     const screenPosition = new THREE.Vector3(x, y, z).project(camera);
-    const screenX = (screenPosition.x * centerX) + centerX;
-    const screenY = -(screenPosition.y * centerY) + centerY;
-    const distanceFromCenter = Math.sqrt(
-      (screenX - centerX) ** 2 + (screenY - centerY) ** 2
-    );
+    const radialDistance = Math.sqrt(screenPosition.x ** 2 + screenPosition.y ** 2);
 
-    // Calcola l'opacità basata sulla distanza dal centro
-    opacities[i] = 1 - Math.min(distanceFromCenter / maxDistance, 1);
+    // Mappa la distanza in un range di opacità
+    opacities[i] = Math.max(1 - radialDistance * 1.5, 0); // Scala e limita tra 0 e 1
   }
 
   particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -345,10 +337,10 @@ function addParticles() {
     color: 0xffffff,
     size: 0.01,
     transparent: true,
-    vertexColors: false // Opacità personalizzata
+    vertexColors: true
   });
 
-  // Usa un aggiornamento per gestire l'opacità variabile
+  // Modifica il material per considerare l'opacità personalizzata
   particlesMaterial.onBeforeCompile = (shader) => {
     shader.vertexShader = shader.vertexShader.replace(
       `void main() {`,
@@ -373,7 +365,6 @@ function addParticles() {
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
 }
-
 
 function animate() {
   requestAnimationFrame(animate);

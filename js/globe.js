@@ -48,7 +48,7 @@ function init() {
     addOrbitingPins();
   
     // Sposta tutta la scena principale verso destra (senza particelle)
-    adjustScenePosition(1.0); // Spostamento lungo l'asse X
+    adjustScenePosition(0.8); // Spostamento lungo l'asse X
   
     // Event listener per il clic del mouse
     window.addEventListener('pointerdown', onMouseClick);

@@ -11,7 +11,8 @@ function init() {
 
   // Inizializza la camera
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
+  camera.position.set(1.5, 0, 5); // Sposta la camera verso destra
+  camera.lookAt(0.5, 0, 0); // Mantieni il focus verso il centro della nuova scena
 
   // Inizializza il renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,9 +48,6 @@ function init() {
   // Aggiungi i pin in orbita attorno al globo
   addOrbitingPins();
 
-  // Sposta gli elementi principali della scena a destra
-  shiftSceneElements(0.5); // Sposta lungo l'asse X
-
   // Event listener per il clic del mouse
   window.addEventListener('pointerdown', onMouseClick);
 
@@ -74,20 +72,6 @@ function init() {
   animate();
 }
 
-function shiftSceneElements(offsetX) {
-  // Sposta il globo
-  globe.position.x += offsetX;
-
-  // Sposta il livello delle nuvole
-  cloudLayer.position.x += offsetX;
-
-  // Sposta tutti i gruppi orbitali
-  orbitGroups.forEach(group => {
-    group.position.x += offsetX;
-  });
-}
-
-
 function addGlobe() {
   const geometry = new THREE.SphereGeometry(0.45, 64, 64);
   const textureLoader = new THREE.TextureLoader();
@@ -102,6 +86,7 @@ function addGlobe() {
   });
 
   globe = new THREE.Mesh(geometry, material);
+  globe.position.x = 0.5; // Sposta il globo verso destra
   scene.add(globe);
 }
 
@@ -118,6 +103,7 @@ function addCloudLayer() {
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
+  cloudLayer.position.x = 0.5; // Sposta le nuvole verso destra
   scene.add(cloudLayer);
 }
 
@@ -143,6 +129,7 @@ function addOrbitingPins() {
     }
 
     orbitGroup.rotation.y += pos.startRotation;
+    orbitGroup.position.x = 0.5; // Sposta il gruppo orbitale verso destra
     scene.add(orbitGroup);
 
     const pin = createPin(pos.label);

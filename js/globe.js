@@ -5,71 +5,87 @@ const orbitGroups = []; // Gruppi per i pin in orbita
 let raycaster, mouse; // Variabili per il raycasting
 
 function init() {
-  const container = document.getElementById('globe-container');
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0f0f0f);
-
-  // Inizializza la camera
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
-
-  // Inizializza il renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth - 300, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  container.appendChild(renderer.domElement);
-
-  // Inizializza il label renderer per i testi descrittivi
-  labelRenderer = new THREE.CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
-  labelRenderer.domElement.style.position = 'absolute';
-  labelRenderer.domElement.style.top = '0';
-  container.appendChild(labelRenderer.domElement);
-
-  // Aggiungi luci alla scena
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-  scene.add(ambientLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-  directionalLight.position.set(5, 3, 5);
-  scene.add(directionalLight);
-
-  // Inizializza il raycaster e il mouse
-  raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
-
-  // Aggiungi il globo
-  addGlobe();
-
-  // Aggiungi il livello delle nuvole sopra il globo
-  addCloudLayer();
-
-  // Aggiungi i pin in orbita attorno al globo
-  addOrbitingPins();
-
-  // Event listener per il clic del mouse
-  window.addEventListener('pointerdown', onMouseClick);
-
-  // Imposta i controlli per la telecamera
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableZoom = false;
-  controls.minDistance = 2.5;
-  controls.maxDistance = 2.5;
-  controls.enablePan = false;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.09;
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.1;
-
-  // Event listener per il ridimensionamento
-  window.addEventListener('resize', onWindowResize);
-  onWindowResize();
-
-  // Aggiungi particelle
-  addParticles();
-
-  animate();
-}
+    const container = document.getElementById('globe-container');
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f0f0f);
+  
+    // Inizializza la camera
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+  
+    // Inizializza il renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth - 300, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+  
+    // Inizializza il label renderer per i testi descrittivi
+    labelRenderer = new THREE.CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth - 300, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    container.appendChild(labelRenderer.domElement);
+  
+    // Aggiungi luci alla scena
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+    scene.add(ambientLight);
+  
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set(5, 3, 5);
+    scene.add(directionalLight);
+  
+    // Inizializza il raycaster e il mouse
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+  
+    // Aggiungi il globo
+    addGlobe();
+  
+    // Aggiungi il livello delle nuvole sopra il globo
+    addCloudLayer();
+  
+    // Aggiungi i pin in orbita attorno al globo
+    addOrbitingPins();
+  
+    // Sposta tutta la scena principale verso destra (senza particelle)
+    adjustScenePosition(0.5); // Spostamento lungo l'asse X
+  
+    // Event listener per il clic del mouse
+    window.addEventListener('pointerdown', onMouseClick);
+  
+    // Imposta i controlli per la telecamera
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = false;
+    controls.minDistance = 2.5;
+    controls.maxDistance = 2.5;
+    controls.enablePan = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.09;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+  
+    // Event listener per il ridimensionamento
+    window.addEventListener('resize', onWindowResize);
+    onWindowResize();
+  
+    // Aggiungi particelle
+    addParticles();
+  
+    animate();
+  }
+  
+  function adjustScenePosition(offsetX) {
+    // Sposta il globo
+    globe.position.x += offsetX;
+  
+    // Sposta il livello delle nuvole
+    cloudLayer.position.x += offsetX;
+  
+    // Sposta tutti i gruppi orbitali
+    orbitGroups.forEach(group => {
+      group.position.x += offsetX;
+    });
+  }
 
 function addGlobe() {
   const geometry = new THREE.SphereGeometry(0.45, 64, 64);

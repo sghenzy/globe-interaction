@@ -69,6 +69,8 @@ function init() {
   // Aggiungi particelle
   addParticles();
 
+  addRadialGradientOverlay();
+
   animate();
 }
 

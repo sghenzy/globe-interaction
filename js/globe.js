@@ -69,8 +69,6 @@ function init() {
   // Aggiungi particelle
   addParticles();
 
-  addRadialGradientOverlay();
-
   animate();
 }
 
@@ -324,42 +322,6 @@ function addParticles() {
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
 }
-
-function addRadialGradientOverlay() {
-  // Crea un canvas per il gradiente radiale
-  const canvas = document.createElement('canvas');
-  const size = 512; // Dimensione del canvas
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-
-  // Disegna il gradiente radiale
-  const gradient = ctx.createRadialGradient(
-    size / 2, size / 2, 0, // Centro del gradiente
-    size / 2, size / 2, size / 2 // Raggio massimo
-  );
-  gradient.addColorStop(0, 'rgba(0, 0, 0, 1)'); // Opacità 100%
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Opacità 0%
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-
-  // Usa il canvas come texture
-  const texture = new THREE.CanvasTexture(canvas);
-
-  // Crea un piano con la texture
-  const geometry = new THREE.PlaneGeometry(20, 20); // Dimensioni del piano
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    transparent: true,
-    blending: THREE.MultiplyBlending // Applica il blending
-  });
-
-  const gradientPlane = new THREE.Mesh(geometry, material);
-  gradientPlane.position.set(0, 0, -5); // Posiziona il piano davanti al particle system
-  scene.add(gradientPlane);
-}
-
 
 function onWindowResize() {
   let containerWidth = window.innerWidth;

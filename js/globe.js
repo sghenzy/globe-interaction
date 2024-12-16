@@ -7,12 +7,11 @@ let raycaster, mouse; // Variabili per il raycasting
 function init() {
   const container = document.getElementById('globe-container');
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0f0f0f);
+  scene.background = new THREE.Color(0x161616);
 
   // Inizializza la camera
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(1.5, 0, 5); // Sposta la camera verso destra
-  camera.lookAt(0.5, 0, 0); // Mantieni il focus verso il centro della nuova scena
+  camera.position.z = 5;
 
   // Inizializza il renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -86,7 +85,6 @@ function addGlobe() {
   });
 
   globe = new THREE.Mesh(geometry, material);
-  globe.position.x = 0.5; // Sposta il globo verso destra
   scene.add(globe);
 }
 
@@ -103,7 +101,6 @@ function addCloudLayer() {
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
-  cloudLayer.position.x = 0.5; // Sposta le nuvole verso destra
   scene.add(cloudLayer);
 }
 
@@ -129,7 +126,6 @@ function addOrbitingPins() {
     }
 
     orbitGroup.rotation.y += pos.startRotation;
-    orbitGroup.position.x = 0.5; // Sposta il gruppo orbitale verso destra
     scene.add(orbitGroup);
 
     const pin = createPin(pos.label);

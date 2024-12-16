@@ -7,7 +7,7 @@ let raycaster, mouse; // Variabili per il raycasting
 function init() {
   const container = document.getElementById('globe-container');
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0f0f0f;
+  scene.background = new THREE.Color(0x0f0f0f);
 
   // Inizializza la camera
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);

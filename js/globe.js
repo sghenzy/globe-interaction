@@ -45,7 +45,7 @@ function init() {
   addCloudLayer();
 
   // Aggiungi i pin in orbita attorno al globo
-  addOrbitingPins();
+  addOPins();
 
   // Event listener per il clic del mouse
   window.addEventListener('pointerdown', onMouseClick);
@@ -104,43 +104,41 @@ function addCloudLayer() {
   scene.add(cloudLayer);
 }
 
-function addOrbitingPins() {
-  const pinPositions = [
-    { label: "Il Cairo", inclination: 0, startRotation: 0 },
-    { label: "New York", inclination: Math.PI / 4, startRotation: 1 },
-    { label: "Londra", inclination: Math.PI / 2, startRotation: 2 },
-    { label: "Tokyo", inclination: Math.PI / 6, startRotation: 3 },
-    { label: "Roma", inclination: Math.PI / 3, startRotation: 4 },
-    { label: "Mosca", inclination: Math.PI / 8, startRotation: 5 },
-    { label: "Sydney", inclination: Math.PI / 12, startRotation: 6 },
-    { label: "Parigi", inclination: Math.PI / 2, startRotation: 7, axis: 'z' }
+function addPins() {
+  const pinData = [
+    { label: "Il Cairo", lat: 30.0444, lon: 31.2357 },
+    { label: "New York", lat: 40.7128, lon: -74.0060 },
+    { label: "Londra", lat: 51.5074, lon: -0.1278 },
+    { label: "Tokyo", lat: 35.6895, lon: 139.6917 },
+    { label: "Roma", lat: 41.9028, lon: 12.4964 },
+    { label: "Mosca", lat: 55.7558, lon: 37.6173 },
+    { label: "Sydney", lat: -33.8688, lon: 151.2093 },
+    { label: "Parigi", lat: 48.8566, lon: 2.3522 }
   ];
 
-  const orbitRadius = 0.5;
+  const radius = 0.46; // Poco sopra la superficie del globo
 
-  pinPositions.forEach((pos, index) => {
-    const orbitGroup = new THREE.Group();
-    orbitGroup.rotation.x = pos.inclination;
-    if (pos.axis === 'z') {
-      orbitGroup.rotation.y = pos.inclination;
-    }
+  pinData.forEach(({ label, lat, lon }) => {
+    const phi = (90 - lat) * (Math.PI / 180); // Converti latitudine in rad
+    const theta = (lon + 180) * (Math.PI / 180); // Converti longitudine in rad
 
-    orbitGroup.rotation.y += pos.startRotation;
-    scene.add(orbitGroup);
+    // Converte coordinate sferiche in 3D
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
 
-    const pin = createPin(pos.label);
-    pin.position.x = orbitRadius;
+    const pin = createPin(label);
+    pin.position.set(x, y, z);
 
-    pin.userData = {
-      index: index,
-      label: pos.label
-    };
+    // Allinea il pin rispetto alla superficie del globo
+    pin.lookAt(globe.position);
 
-    orbitGroup.add(pin);
+    // Aggiungilo come figlio del globo per ruotare con esso
+    globe.add(pin);
     pins.push(pin);
-    orbitGroups.push(orbitGroup);
   });
 }
+
 
 function createPin(labelText) {
   const pinGeometry = new THREE.SphereGeometry(0.015, 16, 16);

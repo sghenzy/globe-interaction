@@ -116,7 +116,7 @@ function addPins() {
     { label: "Parigi", lat: 48.8566, lon: 2.3522 }
   ];
 
-  const radius = 0.7; // Poco sopra la superficie del globo
+  const radius = 0.54; // Poco sopra la superficie del globo
 
   pinData.forEach(({ label, lat, lon }) => {
     const phi = (90 - lat) * (Math.PI / 180); // Converti latitudine in rad

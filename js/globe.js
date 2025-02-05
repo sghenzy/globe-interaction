@@ -57,7 +57,7 @@ function init() {
   controls.maxDistance = 2.5;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.3;
+  controls.autoRotateSpeed = 0.5;
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
@@ -185,44 +185,26 @@ function resetScene() {
   }
 }
 
-let particlesOriginalPositions; // Nuovo array per le posizioni originali
-
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
-  particlesOriginalPositions = new Float32Array(particlesCount * 3); // Salviamo le posizioni originali
 
   for (let i = 0; i < particlesCount * 3; i += 3) {
     const distance = Math.random() * 10 + 2;
     const angle1 = Math.random() * Math.PI * 2;
     const angle2 = Math.acos((Math.random() * 2) - 1);
 
-    const x = distance * Math.sin(angle2) * Math.cos(angle1);
-    const y = distance * Math.sin(angle2) * Math.sin(angle1);
-    const z = distance * Math.cos(angle2);
-
-    positions[i] = x;
-    positions[i + 1] = y;
-    positions[i + 2] = z;
-
-    particlesOriginalPositions[i] = x;
-    particlesOriginalPositions[i + 1] = y;
-    particlesOriginalPositions[i + 2] = z;
+    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
+    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
+    positions[i + 2] = distance * Math.cos(angle2);
   }
 
-  particlesGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const particlesMaterial = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 0.01,
-    transparent: true,
-    opacity: 0.5,
-  });
-
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
 }
-
 
 function onWindowResize() {
   let containerWidth = window.innerWidth;
@@ -235,7 +217,6 @@ function onWindowResize() {
   labelRenderer.setSize(containerWidth, containerHeight);
 }
 
-const PARTICLE_SPEED = 0.00005; // Velocità più lenta per le particelle
 function animate() {
   requestAnimationFrame(animate);
 
@@ -244,7 +225,7 @@ function animate() {
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
-    particleSystem.rotation.y += PARTICLE_SPEED; // Rotazione lenta delle particelle
+    particleSystem.rotation.y += 0.000001; // Rotazione lenta delle particelle
   }
 
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali

@@ -225,7 +225,7 @@ function animate() {
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
-    particleSystem.rotation.y += 0.0005; // Rotazione lenta delle particelle
+    particleSystem.rotation.y += 0.0001; // Rotazione lenta delle particelle
   }
 
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali

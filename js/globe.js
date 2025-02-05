@@ -57,7 +57,7 @@ function init() {
   controls.maxDistance = 2.5;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.09;
+  controls.autoRotateSpeed = 0.1;
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 

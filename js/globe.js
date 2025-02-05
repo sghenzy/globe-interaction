@@ -185,21 +185,30 @@ function resetScene() {
   }
 }
 
-let particlesGroup; // Nuova variabile globale
+let particlesOriginalPositions; // Nuovo array per le posizioni originali
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
+  particlesOriginalPositions = new Float32Array(particlesCount * 3); // Salviamo le posizioni originali
 
   for (let i = 0; i < particlesCount * 3; i += 3) {
     const distance = Math.random() * 10 + 2;
     const angle1 = Math.random() * Math.PI * 2;
     const angle2 = Math.acos((Math.random() * 2) - 1);
 
-    positions[i] = distance * Math.sin(angle2) * Math.cos(angle1);
-    positions[i + 1] = distance * Math.sin(angle2) * Math.sin(angle1);
-    positions[i + 2] = distance * Math.cos(angle2);
+    const x = distance * Math.sin(angle2) * Math.cos(angle1);
+    const y = distance * Math.sin(angle2) * Math.sin(angle1);
+    const z = distance * Math.cos(angle2);
+
+    positions[i] = x;
+    positions[i + 1] = y;
+    positions[i + 2] = z;
+
+    particlesOriginalPositions[i] = x;
+    particlesOriginalPositions[i + 1] = y;
+    particlesOriginalPositions[i + 2] = z;
   }
 
   particlesGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -211,11 +220,8 @@ function addParticles() {
   });
 
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
-
-  // Aggiungiamo le particelle direttamente alla scena, senza collegarle al globo
   scene.add(particleSystem);
 }
-
 
 
 function onWindowResize() {

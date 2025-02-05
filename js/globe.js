@@ -150,41 +150,6 @@ function createPin(labelText) {
   return pin;
 }
 
-function onMouseClick(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(pins);
-
-  if (intersects.length > 0) {
-    const pin = intersects[0].object;
-    focusOnPin(pin.userData.index);
-  } else {
-    resetScene(); // Aggiunto: Reset scena se clicco fuori dai pin
-  }
-}
-
-function focusOnPin(pinIndex) {
-  const pin = pins[pinIndex];
-  if (!pin) return;
-
-  orbitGroups.forEach(group => group.rotation.y = group.rotation.y);
-  controls.autoRotate = false;
-
-  if (selectedPin) {
-    selectedPin.material.color.set('rgb(144, 238, 144)');
-  }
-
-  pin.material.color.set('rgb(0, 102, 255)');
-  selectedPin = pin;
-
-  const pinWorldPosition = new THREE.Vector3();
-  pin.getWorldPosition(pinWorldPosition);
-
-  addInfoBox(pinWorldPosition, pin.userData.label);
-}
-
 function resetScene() {
   const existingBox = document.getElementById('info-box');
   if (existingBox) {
@@ -246,57 +211,6 @@ function addInfoBox(pinPosition, pinLabel) {
   const directionY = pinY - halfHeight;
   const length = Math.sqrt(directionX * directionX + directionY * directionY);
 
-  // Normalizza la direzione per applicare la distanza fissa
-  const normalizedX = directionX / length;
-  const normalizedY = directionY / length;
-
-  // Calcola la posizione del box applicando la distanza fissa
-  const boxX = pinX + normalizedX * fixedDistance;
-  let boxY = pinY + normalizedY * fixedDistance + 30;
-
-  // Assicura che il box non sia più vicino di 5vh dal bordo inferiore
-  const maxBoxY = window.innerHeight - (window.innerHeight * 0.09); // Limite inferiore
-  if (boxY + box.offsetHeight > maxBoxY) {
-    boxY = maxBoxY - box.offsetHeight; // Riposiziona il box sopra il limite
-  }
-
-  // Applica la posizione del box
-  box.style.left = `${boxX - box.offsetWidth / 2}px`; // Centra il box orizzontalmente
-  box.style.top = `${boxY}px`; // Posiziona il box con il limite inferiore
-
-  // Disegna la linea dal pin al box
-  drawLineToBox(pinPosition, boxX, boxY, box);
-}
-
-
-function drawLineToBox(pinPosition, boxX, boxY, box) {
-  // Calcola la posizione centrata del box
-  const boxCenterX = boxX;
-  const boxCenterY = boxY;
-
-  // Converti le coordinate 2D del box al centro in coordinate 3D
-  const boxWorldPosition = new THREE.Vector3(
-    (boxCenterX / window.innerWidth) * 2 - 1,
-    -(boxCenterY / window.innerHeight) * 2 + 1,
-    0
-  ).unproject(camera);
-
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x807d7d });
-  const lineGeometry = new THREE.BufferGeometry();
-
-  // Imposta i punti della linea
-  lineGeometry.setFromPoints([pinPosition, boxWorldPosition]);
-
-  // Rimuovi la linea precedente se esiste
-  if (scene.userData.lastLine) {
-    scene.remove(scene.userData.lastLine);
-  }
-
-  // Aggiungi la nuova linea
-  const line = new THREE.Line(lineGeometry, lineMaterial);
-  scene.userData.lastLine = line;
-  scene.add(line);
-}
 
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();

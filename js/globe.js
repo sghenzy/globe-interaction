@@ -57,7 +57,7 @@ function init() {
   controls.maxDistance = 2.5;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.1;
+  controls.autoRotateSpeed = 0.2;
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
@@ -231,7 +231,7 @@ function animate() {
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
   if (controls.autoRotate) {
     orbitGroups.forEach(group => {
-      group.rotation.y += 5; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+      group.rotation.y += 0.001; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
     });
   }
 

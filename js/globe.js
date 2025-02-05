@@ -185,6 +185,8 @@ function resetScene() {
   }
 }
 
+let particlesGroup; // Nuova variabile globale
+
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
@@ -202,9 +204,15 @@ function addParticles() {
 
   particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
-  scene.add(particleSystem);
+
+  // Creiamo un gruppo e aggiungiamo le particelle
+  particlesGroup = new THREE.Group();
+  particlesGroup.add(particleSystem);
+  scene.add(particlesGroup);
 }
+
 
 function onWindowResize() {
   let containerWidth = window.innerWidth;

@@ -45,7 +45,7 @@ function init() {
   addCloudLayer();
 
   // Aggiungi i pin in orbita attorno al globo
-  addOPins();
+  addPins();
 
   // Event listener per il clic del mouse
   window.addEventListener('pointerdown', onMouseClick);

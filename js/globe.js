@@ -202,16 +202,20 @@ function addParticles() {
     positions[i + 2] = distance * Math.cos(angle2);
   }
 
-  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particlesMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.01, transparent: true, opacity: 0.5 });
+  particlesGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const particlesMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.01,
+    transparent: true,
+    opacity: 0.5,
+  });
 
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
 
-  // Creiamo un gruppo e aggiungiamo le particelle
-  particlesGroup = new THREE.Group();
-  particlesGroup.add(particleSystem);
-  scene.add(particlesGroup);
+  // Aggiungiamo le particelle direttamente alla scena, senza collegarle al globo
+  scene.add(particleSystem);
 }
+
 
 
 function onWindowResize() {
@@ -225,6 +229,7 @@ function onWindowResize() {
   labelRenderer.setSize(containerWidth, containerHeight);
 }
 
+const PARTICLE_SPEED = 0.00005; // Velocità più lenta per le particelle
 function animate() {
   requestAnimationFrame(animate);
 
@@ -233,7 +238,7 @@ function animate() {
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
-    particleSystem.rotation.y += 0.000000001; // Rotazione lenta delle particelle
+    particleSystem.rotation.y += PARTICLE_SPEED; // Rotazione lenta delle particelle
   }
 
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali

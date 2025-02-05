@@ -231,7 +231,7 @@ function animate() {
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
   if (controls.autoRotate) {
     orbitGroups.forEach(group => {
-      group.rotation.y += 0.0007; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+      group.rotation.y += 0.001; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
     });
   }
 

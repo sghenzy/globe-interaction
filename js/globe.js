@@ -97,7 +97,7 @@ function addCloudLayer() {
     map: cloudsTexture,
     transparent: true,
     blending: THREE.AdditiveBlending,
-    opacity: 0.3
+    opacity: 0.2
   });
 
   cloudLayer = new THREE.Mesh(geometry, material);
@@ -231,7 +231,7 @@ function animate() {
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
   if (controls.autoRotate) {
     orbitGroups.forEach(group => {
-      group.rotation.y += 0.0005; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+      group.rotation.y += 0.0007; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
     });
   }
 

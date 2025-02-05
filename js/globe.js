@@ -221,7 +221,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   // Mantieni in rotazione il livello delle nuvole
-  cloudLayer.rotation.y += 0.0008;
+  cloudLayer.rotation.y += 0.00004;
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
@@ -231,7 +231,7 @@ function animate() {
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
   if (controls.autoRotate) {
     orbitGroups.forEach(group => {
-      group.rotation.y += 0.5; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+      group.rotation.y += 1; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
     });
   }
 

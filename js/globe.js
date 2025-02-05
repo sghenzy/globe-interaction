@@ -57,7 +57,7 @@ function init() {
   controls.maxDistance = 2.5;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.5;
+  controls.autoRotateSpeed = 0.3;
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
@@ -225,7 +225,7 @@ function animate() {
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
-    particleSystem.rotation.y += 0.000001; // Rotazione lenta delle particelle
+    particleSystem.rotation.y += 0.000000001; // Rotazione lenta delle particelle
   }
 
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali

@@ -221,17 +221,17 @@ function animate() {
   requestAnimationFrame(animate);
 
   // Mantieni in rotazione il livello delle nuvole
-  cloudLayer.rotation.y += 0.0004;
+  cloudLayer.rotation.y += 0.0008;
 
   // Mantieni in rotazione le particelle di sfondo
   if (particleSystem) {
-    particleSystem.rotation.y += 0.0002; // Rotazione lenta delle particelle
+    particleSystem.rotation.y += 0.0005; // Rotazione lenta delle particelle
   }
 
   // Mantieni il controllo della rotazione del globo e dei gruppi orbitali
   if (controls.autoRotate) {
     orbitGroups.forEach(group => {
-      group.rotation.y += 0.0002; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
+      group.rotation.y += 0.0005; // Ruota i gruppi orbitali solo se l'auto-rotate è attivo
     });
   }
 

@@ -171,47 +171,6 @@ function resetScene() {
   }
 }
 
-function addInfoBox(pinPosition, pinLabel) {
-  // Rimuovi eventuale info box esistente
-  const existingBox = document.getElementById('info-box');
-  if (existingBox) {
-    existingBox.remove();
-  }
-
-  // Crea il box con il titolo e la descrizione
-  const box = document.createElement('div');
-  box.id = 'info-box';
-  box.style.position = 'absolute';
-  box.style.backgroundColor = ' rgba(214, 214, 214, 50)';
-  box.style.backdropFilter = 'blur(10px)'; 
-  box.style.padding = '10px';
-  box.style.borderRadius = '5px';
-  box.style.color = 'black';
-  box.style.fontFamily = 'Gotham, sans-serif';
-  box.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-  box.innerHTML = `
-    <h3 style="margin: 0; margin-bottom: 1vh;">${pinLabel}</h3>
-    <p style="margin: 0;">Breve descrizione del pin selezionato</p>
-  `;
-
-  document.body.appendChild(box);
-
-  // Imposta una distanza fissa maggiore per il box dal pin
-  const fixedDistance = 250; // Distanza fissa aumentata in pixel
-  const screenPosition = pinPosition.clone().project(camera);
-  const halfWidth = window.innerWidth / 2;
-  const halfHeight = window.innerHeight / 2;
-
-  // Coordinate del pin sullo schermo
-  const pinX = (screenPosition.x * halfWidth) + halfWidth;
-  const pinY = -(screenPosition.y * halfHeight) + halfHeight;
-
-  // Calcola la direzione dal pin per posizionare il box
-  const directionX = pinX - halfWidth;
-  const directionY = pinY - halfHeight;
-  const length = Math.sqrt(directionX * directionX + directionY * directionY);
-
-
 function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;

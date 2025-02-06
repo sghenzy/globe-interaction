@@ -99,7 +99,7 @@ function animateGlobeEntry() {
   // Usa GSAP per animare dolcemente fino a Math.PI / 2
   gsap.to([globe.rotation, cloudLayer.rotation], {
     y: Math.PI / 2, // Arriva alla rotazione finale
-    duration: 3,    // Durata dell'animazione in secondi
+    duration: 5,    // Durata dell'animazione in secondi
     ease: "power2.out"
   });
 }

@@ -78,7 +78,7 @@ function addGlobe() {
     function (texture) {
       texture.wrapS = THREE.RepeatWrapping; // Assicura il wrapping orizzontale
       /** texture.wrapT = THREE.RepeatWrapping; // Assicura il wrapping verticale **/
-      texture.offset.x = -0.48; // Sposta la texture in orizzontale (da -1 a 1)
+      texture.offset.x = -0.45; // Sposta la texture in orizzontale (da -1 a 1)
     });
 
   const material = new THREE.MeshStandardMaterial({

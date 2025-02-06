@@ -76,8 +76,8 @@ function addGlobe() {
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp',
     function (texture) {
-      texture.wrapS = THREE.RepeatWrapping; // Assicura il wrapping orizzontale
-      texture.wrapT = THREE.RepeatWrapping; // Assicura il wrapping verticale
+      /** texture.wrapS = THREE.RepeatWrapping; // Assicura il wrapping orizzontale
+      texture.wrapT = THREE.RepeatWrapping; // Assicura il wrapping verticale **/
       texture.offset.x = 2; // Sposta la texture in orizzontale (da -1 a 1)
       texture.offset.y = 0.0; // Sposta la texture in verticale (da -1 a 1)
     });

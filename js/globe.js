@@ -151,7 +151,7 @@ function addPins() {
     { label: "Londra", lat: 51.5074, lon: -0.1278 },
     { label: "Parigi", lat: 48.8566, lon: 2.3522 },
     { label: "Milano", lat: 45.4642, lon: 9.1900 },
-    { label: "Dubai", lat: 25.276987, lon: 55.296249 },
+    { label: "Dubai", lat: -25.276987, lon: 55.296249 },
     { label: "Roma", lat: 41.9028, lon: 12.4964 },
     { label: "Praga", lat: 50.0755, lon: 14.4378 }
   ];

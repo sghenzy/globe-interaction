@@ -149,10 +149,10 @@ function addCloudLayer() {
 function addPins() {
   const pinData = [
     { label: "Londra", lat: 51.5074, lon: -2.1278 },
-    { label: "Roma", lat: 38.8566, lon: 3.3522 },
-    { label: "Milano", lat: 44.4642, lon: 7.1900 },
+    { label: "Roma", lat: 40.8566, lon: 3.3522 },
+    { label: "Milano", lat: 44.4642, lon: 6.1900 },
     { label: "Dubai", lat: 25.276987, lon: -55.296249 },
-    { label: "Parigi", lat: 41.9028, lon: 12.4964 },
+    { label: "Parigi", lat: 48.9028, lon: 12.4964 },
     { label: "Praga", lat: 50.0755, lon: 14.4378 }
   ];
 

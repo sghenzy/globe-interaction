@@ -85,6 +85,8 @@ function addGlobe() {
   });
 
   globe = new THREE.Mesh(geometry, material);
+  globe.rotation.y = Math.PI / 2; // Ruota il globo di 90° verso sinistra
+
   scene.add(globe);
 }
 

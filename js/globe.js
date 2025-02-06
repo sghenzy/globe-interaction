@@ -181,7 +181,7 @@ function createPin(labelText) {
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
   // Creazione dell'etichetta
-  const labelDiv = document.createElement('div');
+  /** const labelDiv = document.createElement('div');
   labelDiv.className = 'pin-label';
   labelDiv.textContent = labelText;
   labelDiv.style.position = 'absolute';
@@ -194,7 +194,7 @@ function createPin(labelText) {
   // Usa CSS2DObject per renderizzare il testo
   const label = new THREE.CSS2DObject(labelDiv);
   label.position.set(0.02, 0.02, 0); // Regola la posizione rispetto al pin
-  pin.add(label); // Aggiungi il testo al pin
+  pin.add(label); // Aggiungi il testo al pin **/
   
   return pin;
 }

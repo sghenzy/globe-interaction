@@ -92,30 +92,27 @@ function addGlobe() {
 
 
 function animateGlobeEntry() {
-  // Usare GSAP per animare la rotazione
+  // Imposta la rotazione iniziale più indietro di 180° (-Math.PI / 2)
+  globe.rotation.y = -Math.PI / 2;
+
+  // Usa GSAP per animare dolcemente fino a Math.PI / 2
   gsap.to(globe.rotation, {
-    y: Math.PI * 2, // Ruota di 360°
-    duration: 3,    // Durata animazione in secondi
-    ease: "power2.out",
-    onComplete: () => {
-      // Dopo la rotazione, fermarsi a Math.PI / 2
-      gsap.to(globe.rotation, {
-        y: Math.PI / 2,
-        duration: 1,
-        ease: "power2.out"
-      });
-    }
+    y: Math.PI / 2, // Arriva alla rotazione finale
+    duration: 3,    // Durata dell'animazione in secondi
+    ease: "power2.out"
   });
 }
+
 // Rileva quando il globo entra in vista con IntersectionObserver
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       animateGlobeEntry();
-      observer.unobserve(entry.target); // Rimuove l'osservazione dopo l'animazione
+      observer.unobserve(entry.target); // Evita di ripetere l'animazione
     }
   });
 }, { threshold: 0.5 });
+
 // Assicurati che l'elemento #globe-container sia il contenitore corretto
 const globeContainer = document.getElementById('globe-container');
 if (globeContainer) {

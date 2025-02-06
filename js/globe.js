@@ -90,6 +90,41 @@ function addGlobe() {
   scene.add(globe);
 }
 
+
+function animateGlobeEntry() {
+  // Usare GSAP per animare la rotazione
+  gsap.to(globe.rotation, {
+    y: Math.PI * 2, // Ruota di 360°
+    duration: 3,    // Durata animazione in secondi
+    ease: "power2.out",
+    onComplete: () => {
+      // Dopo la rotazione, fermarsi a Math.PI / 2
+      gsap.to(globe.rotation, {
+        y: Math.PI / 2,
+        duration: 1,
+        ease: "power2.out"
+      });
+    }
+  });
+}
+// Rileva quando il globo entra in vista con IntersectionObserver
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateGlobeEntry();
+      observer.unobserve(entry.target); // Rimuove l'osservazione dopo l'animazione
+    }
+  });
+}, { threshold: 0.5 });
+// Assicurati che l'elemento #globe-container sia il contenitore corretto
+const globeContainer = document.getElementById('globe-container');
+if (globeContainer) {
+  observer.observe(globeContainer);
+}
+
+
+ // LAYER DELLE NUVOLE
+
 function addCloudLayer() {
   const geometry = new THREE.SphereGeometry(0.452, 64, 64);
   const textureLoader = new THREE.TextureLoader();
@@ -105,6 +140,8 @@ function addCloudLayer() {
   cloudLayer = new THREE.Mesh(geometry, material);
   scene.add(cloudLayer);
 }
+
+
 
 function addPins() {
   const pinData = [

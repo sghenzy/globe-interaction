@@ -74,7 +74,13 @@ function init() {
 function addGlobe() {
   const geometry = new THREE.SphereGeometry(0.45, 64, 64);
   const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp');
+  const earthTexture = textureLoader.load('https://sghenzy.github.io/globe-interaction/img/convertite/Earth%20Night%20Map%202k.webp',
+    function (texture) {
+      texture.wrapS = THREE.RepeatWrapping; // Assicura il wrapping orizzontale
+      texture.wrapT = THREE.RepeatWrapping; // Assicura il wrapping verticale
+      texture.offset.x = 0.2; // Sposta la texture in orizzontale (da -1 a 1)
+      texture.offset.y = 0.0; // Sposta la texture in verticale (da -1 a 1)
+    });
 
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,

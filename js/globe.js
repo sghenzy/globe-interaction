@@ -180,6 +180,22 @@ function createPin(labelText) {
   const pinMaterial = new THREE.MeshStandardMaterial({ color: '#570000' }); // Rosso
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 
+  // Creazione dell'etichetta
+  const labelDiv = document.createElement('div');
+  labelDiv.className = 'pin-label';
+  labelDiv.textContent = labelText;
+  labelDiv.style.position = 'absolute';
+  labelDiv.style.color = 'white';
+  labelDiv.style.fontSize = '12px';
+  labelDiv.style.padding = '2px 5px';
+  labelDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+  labelDiv.style.borderRadius = '4px';
+
+  // Usa CSS2DObject per renderizzare il testo
+  const label = new THREE.CSS2DObject(labelDiv);
+  label.position.set(0.02, 0.02, 0); // Regola la posizione rispetto al pin
+  pin.add(label); // Aggiungi il testo al pin
+  
   return pin;
 }
 

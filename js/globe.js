@@ -139,7 +139,7 @@ function addPins() {
 
 
 function createPin(labelText) {
-  const pinGeometry = new THREE.SphereGeometry(0.01, 16, 16); // Ridotto da 0.015 a 0.01
+  const pinGeometry = new THREE.SphereGeometry(0.009, 16, 16); // Ridotto da 0.015 a 0.01
   const pinMaterial = new THREE.MeshStandardMaterial({ color: 'rgb(255, 0, 0)' }); // Rosso
   const pin = new THREE.Mesh(pinGeometry, pinMaterial);
 

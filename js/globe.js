@@ -94,9 +94,10 @@ function addGlobe() {
 function animateGlobeEntry() {
   // Imposta la rotazione iniziale più indietro di 180° (-Math.PI / 2)
   globe.rotation.y = -Math.PI / 2;
+  cloudLayer.rotation.y = -Math.PI / 2; // Anche il cloudLayer parte dalla stessa rotazione
 
   // Usa GSAP per animare dolcemente fino a Math.PI / 2
-  gsap.to(globe.rotation, {
+  gsap.to([globe.rotation, cloudLayer.rotation], {
     y: Math.PI / 2, // Arriva alla rotazione finale
     duration: 3,    // Durata dell'animazione in secondi
     ease: "power2.out"

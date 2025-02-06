@@ -106,14 +106,12 @@ function addCloudLayer() {
 
 function addPins() {
   const pinData = [
-    { label: "Il Cairo", lat: 30.0444, lon: 31.2357 },
-    { label: "New York", lat: 40.7128, lon: -74.0060 },
     { label: "Londra", lat: 51.5074, lon: -0.1278 },
-    { label: "Tokyo", lat: 35.6895, lon: 139.6917 },
+    { label: "Parigi", lat: 48.8566, lon: 2.3522 },
+    { label: "Milano", lat: 45.4642, lon: 9.1900 },
+    { label: "Dubai", lat: 25.276987, lon: 55.296249 },
     { label: "Roma", lat: 41.9028, lon: 12.4964 },
-    { label: "Mosca", lat: 55.7558, lon: 37.6173 },
-    { label: "Sydney", lat: -33.8688, lon: 151.2093 },
-    { label: "Parigi", lat: 48.8566, lon: 2.3522 }
+    { label: "Praga", lat: 50.0755, lon: 14.4378 }
   ];
 
   const radius = 0.46; // Poco sopra la superficie del globo

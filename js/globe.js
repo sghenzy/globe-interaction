@@ -153,8 +153,8 @@ function addPins() {
     { label: "Roma", lat: 5.8566, lon: 4.3522 },
     { label: "Milano", lat: 10.4642, lon: 10.1900 },
     { label: "Dubai", lat: -10.276987, lon: -36.296249 },
-    { label: "Parigi", lat: 11.9028, lon: 16.4964 },
-    { label: "Londra", lat: 20.0755, lon: 18.4378 }
+    { label: "Parigi", lat: 11.5028, lon: 16.4964 },
+    { label: "Londra", lat: 18.0755, lon: 20.4378 }
   ];
 
   const radius = 0.46; // Poco sopra la superficie del globo

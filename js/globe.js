@@ -151,9 +151,9 @@ function addPins() {
   const pinData = [
     { label: "Londra", lat: 51.5074, lon: -2.1278 },
     { label: "Roma", lat: 5.8566, lon: 3.3522 },
-    { label: "Milano", lat: 10.4642, lon: 4.1900 },
+    { label: "Milano", lat: 10.4642, lon: 8.1900 },
     { label: "Dubai", lat: -10.276987, lon: -36.296249 },
-    { label: "Parigi", lat: 46.9028, lon: 12.4964 },
+    { label: "Parigi", lat: 16.9028, lon: 12.4964 },
     { label: "Praga", lat: 50.0755, lon: 14.4378 }
   ];
 

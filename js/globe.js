@@ -149,12 +149,12 @@ function addCloudLayer() {
 
 function addPins() {
   const pinData = [
-    { label: "Londra", lat: 16.5074, lon: 8.1278 },
+    { label: "Londra", lat: 14.5074, lon: 8.1278 },
     { label: "Roma", lat: 5.8566, lon: 4.3522 },
     { label: "Milano", lat: 10.4642, lon: 10.1900 },
     { label: "Dubai", lat: -10.276987, lon: -36.296249 },
     { label: "Parigi", lat: 12.9028, lon: 16.4964 },
-    { label: "Praga", lat: 50.0755, lon: 14.4378 }
+    { label: "Praga", lat: 20.0755, lon: 14.4378 }
   ];
 
   const radius = 0.46; // Poco sopra la superficie del globo

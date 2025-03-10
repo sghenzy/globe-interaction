@@ -66,7 +66,7 @@ function init() {
   onWindowResize();
 
   // Aggiungi particelle
-  addParticles();
+  // addParticles();
 
   animate();
 }
@@ -242,7 +242,7 @@ function resetScene() {
   }
 }
 
-function addParticles() {
+/*function addParticles() {
   const particlesGeometry = new THREE.BufferGeometry();
   const particlesCount = 5000;
   const positions = new Float32Array(particlesCount * 3);
@@ -262,7 +262,7 @@ function addParticles() {
   particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
   scene.add(particleSystem);
 }
-
+*/
 function onWindowResize() {
   let containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
